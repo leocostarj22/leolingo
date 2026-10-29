@@ -1,13 +1,22 @@
+import { redirect } from "next/navigation";
+
 import { Sidebar } from "@/components/sidebar";
 import { MobileHeader } from "@/components/mobile-header";
+import { getUserProgress } from "@/db/queries";
 
 type Props = {
   children: React.ReactNode;
 };
 
-const MainLayout = ({
+const MainLayout = async ({
   children,
 }: Props) => {
+  const userProgress = await getUserProgress();
+
+  if (!userProgress || !userProgress.gender) {
+    redirect("/profile-setup");
+  }
+
   return (
     <>
       <MobileHeader />
