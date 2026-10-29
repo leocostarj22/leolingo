@@ -33,8 +33,6 @@ export const upsertUserProgress = async (courseId: number) => {
   if (existingUserProgress) {
     await db.update(userProgress).set({
       activeCourseId: courseId,
-      userName: user.firstName || "User",
-      userImageSrc: user.imageUrl || "/mascot.svg",
     });
 
     revalidatePath("/courses");
@@ -52,6 +50,70 @@ export const upsertUserProgress = async (courseId: number) => {
   revalidatePath("/courses");
   revalidatePath("/learn");
   redirect("/learn");
+};
+
+type CompleteUserProfileInput = {
+  firstName: string;
+  lastName?: string;
+  age?: number;
+  gender: "MALE" | "FEMALE";
+  englishLevel?: "BEGINNER" | "BASIC" | "INTERMEDIATE" | "ADVANCED";
+  learningGoal?: "TRAVEL" | "WORK" | "STUDY_ABROAD" | "SPEAK_CONFIDENTLY" | "OTHER";
+};
+
+export const completeUserProfile = async (data: CompleteUserProfileInput): Promise<void> => {
+  if (!data.firstName.trim()) {
+    throw new Error("Name is required");
+  }
+
+  if (data.gender !== "MALE" && data.gender !== "FEMALE") {
+    throw new Error("Invalid gender");
+  }
+
+  if (
+    data.age !== undefined
+    && (!Number.isInteger(data.age) || data.age < 1 || data.age > 120)
+  ) {
+    throw new Error("Invalid age");
+  }
+
+  const { userId } = await auth();
+
+  if (!userId) {
+    throw new Error("Unauthorized");
+  }
+
+  const existingUserProgress = await getUserProgress();
+
+  if (existingUserProgress) {
+    await db.update(userProgress).set({
+      userName: data.firstName.trim(),
+      lastName: data.lastName?.trim() || null,
+      age: data.age ?? null,
+      gender: data.gender,
+      englishLevel: data.englishLevel ?? null,
+      learningGoal: data.learningGoal ?? null,
+    }).where(eq(userProgress.userId, userId));
+
+    revalidatePath("/courses");
+    redirect("/courses");
+  }
+
+  const user = await currentUser();
+
+  await db.insert(userProgress).values({
+    userId,
+    userName: data.firstName.trim(),
+    userImageSrc: user?.imageUrl || "/mascot.svg",
+    lastName: data.lastName?.trim() || null,
+    age: data.age ?? null,
+    gender: data.gender,
+    englishLevel: data.englishLevel ?? null,
+    learningGoal: data.learningGoal ?? null,
+  });
+
+  revalidatePath("/courses");
+  redirect("/courses");
 };
 
 export const reduceHearts = async (challengeId: number) => {
