@@ -33,7 +33,7 @@ export const upsertUserProgress = async (courseId: number) => {
   if (existingUserProgress) {
     await db.update(userProgress).set({
       activeCourseId: courseId,
-    });
+    }).where(eq(userProgress.userId, userId));
 
     revalidatePath("/courses");
     revalidatePath("/learn");
@@ -84,6 +84,10 @@ export const completeUserProfile = async (data: CompleteUserProfileInput): Promi
   }
 
   const existingUserProgress = await getUserProgress();
+
+  if (existingUserProgress?.gender) {
+    redirect("/courses");
+  }
 
   if (existingUserProgress) {
     await db.update(userProgress).set({
