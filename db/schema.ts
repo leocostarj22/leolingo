@@ -45,6 +45,12 @@ export const lessonsRelations = relations(lessons, ({ one, many }) => ({
 
 export const challengesEnum = pgEnum("type", ["SELECT", "ASSIST"]);
 
+export const genderEnum = pgEnum("gender", ["MALE", "FEMALE"]);
+
+export const englishLevelEnum = pgEnum("english_level", ["BEGINNER", "BASIC", "INTERMEDIATE", "ADVANCED"]);
+
+export const learningGoalEnum = pgEnum("learning_goal", ["TRAVEL", "WORK", "STUDY_ABROAD", "SPEAK_CONFIDENTLY", "OTHER"]);
+
 export const challenges = pgTable("challenges", {
   id: serial("id").primaryKey(),
   lessonId: integer("lesson_id").references(() => lessons.id, { onDelete: "cascade" }).notNull(),
@@ -99,6 +105,11 @@ export const userProgress = pgTable("user_progress", {
   activeCourseId: integer("active_course_id").references(() => courses.id, { onDelete: "cascade" }),
   hearts: integer("hearts").notNull().default(25),
   points: integer("points").notNull().default(0),
+  lastName: text("last_name"),
+  age: integer("age"),
+  gender: genderEnum("gender"),
+  englishLevel: englishLevelEnum("english_level"),
+  learningGoal: learningGoalEnum("learning_goal"),
 });
 
 export const userProgressRelations = relations(userProgress, ({ one }) => ({
