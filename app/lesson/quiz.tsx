@@ -8,6 +8,7 @@ import { useState, useTransition } from "react";
 import { useAudio, useWindowSize, useMount } from "react-use";
 
 import { reduceHearts } from "@/actions/user-progress";
+import { normalizeAnswer } from "@/lib/utils";
 import { useMascot } from "@/store/use-mascot";
 import { useHeartsModal } from "@/store/use-hearts-modal";
 import { challengeOptions, challenges, userProgress, userSubscription } from "@/db/schema";
@@ -19,6 +20,7 @@ import { Footer } from "./footer";
 import { Challenge } from "./challenge";
 import { ResultCard } from "./result-card";
 import { QuestionBubble } from "./question-bubble";
+import { WriteChallenge } from "./write-challenge";
 
 type Props ={
   initialPercentage: number;
@@ -83,9 +85,24 @@ export const Quiz = ({
 
   const [selectedOption, setSelectedOption] = useState<number>();
   const [status, setStatus] = useState<"correct" | "wrong" | "none">("none");
+  const [writtenAnswer, setWrittenAnswer] = useState("");
 
   const challenge = challenges[activeIndex];
   const options = challenge?.challengeOptions ?? [];
+
+  const isAnswerReady = (() => {
+    if (challenge?.type === "WRITE") return writtenAnswer.trim().length > 0;
+    return !!selectedOption;
+  })();
+
+  const isAnswerCorrect = () => {
+    if (challenge.type === "WRITE") {
+      const accepted = options.filter((o) => o.correct).map((o) => normalizeAnswer(o.text));
+      return accepted.includes(normalizeAnswer(writtenAnswer));
+    }
+    const correctOption = options.find((option) => option.correct);
+    return !!correctOption && correctOption.id === selectedOption;
+  };
 
   const onNext = () => {
     setActiveIndex((current) => current + 1);
@@ -98,11 +115,12 @@ export const Quiz = ({
   };
 
   const onContinue = () => {
-    if (!selectedOption) return;
+    if (!isAnswerReady) return;
 
     if (status === "wrong") {
       setStatus("none");
       setSelectedOption(undefined);
+      setWrittenAnswer("");
       return;
     }
 
@@ -110,16 +128,32 @@ export const Quiz = ({
       onNext();
       setStatus("none");
       setSelectedOption(undefined);
+      setWrittenAnswer("");
       return;
     }
 
-    const correctOption = options.find((option) => option.correct);
+    if (!isAnswerCorrect()) {
+      startTransition(() => {
+        reduceHearts(challenge.id)
+          .then((response) => {
+            if (response?.error === "hearts") {
+              openHeartsModal();
+              return;
+            }
 
-    if (!correctOption) {
+            incorrectControls.play();
+            setStatus("wrong");
+
+            if (!response?.error) {
+              setHearts((prev) => Math.max(prev - 1, 0));
+            }
+          })
+          .catch(() => toast.error("Something went wrong. Please try again."))
+      });
       return;
     }
 
-    if (correctOption.id === selectedOption) {
+    {
       startTransition(() => {
         upsertChallengeProgress(challenge.id)
           .then((response) => {
@@ -135,24 +169,6 @@ export const Quiz = ({
             // This is a practice
             if (initialPercentage === 100) {
               setHearts((prev) => Math.min(prev + 1, 5));
-            }
-          })
-          .catch(() => toast.error("Something went wrong. Please try again."))
-      });
-    } else {
-      startTransition(() => {
-        reduceHearts(challenge.id)
-          .then((response) => {
-            if (response?.error === "hearts") {
-              openHeartsModal();
-              return;
-            }
-
-            incorrectControls.play();
-            setStatus("wrong");
-
-            if (!response?.error) {
-              setHearts((prev) => Math.max(prev - 1, 0));
             }
           })
           .catch(() => toast.error("Something went wrong. Please try again."))
@@ -232,20 +248,29 @@ export const Quiz = ({
               {challenge.type === "ASSIST" && (
                 <QuestionBubble question={challenge.question} />
               )}
-              <Challenge
-                options={options}
-                onSelect={onSelect}
-                status={status}
-                selectedOption={selectedOption}
-                disabled={pending}
-                type={challenge.type}
-              />
+              {challenge.type === "WRITE" ? (
+                <WriteChallenge
+                  value={writtenAnswer}
+                  onChange={setWrittenAnswer}
+                  status={status}
+                  disabled={pending}
+                />
+              ) : (
+                <Challenge
+                  options={options}
+                  onSelect={onSelect}
+                  status={status}
+                  selectedOption={selectedOption}
+                  disabled={pending}
+                  type={challenge.type}
+                />
+              )}
             </div>
           </div>
         </div>
       </div>
       <Footer
-        disabled={pending || !selectedOption}
+        disabled={pending || !isAnswerReady}
         status={status}
         onCheck={onContinue}
       />
