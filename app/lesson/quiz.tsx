@@ -106,14 +106,24 @@ export const Quiz = ({
   const options = challenge?.challengeOptions ?? [];
   const percentage = (completedIds.size / totalChallengeCount) * 100;
 
-  // Reset per-challenge answer state whenever the active challenge changes
-  // (by advancing or by rotating back after a wrong answer).
-  useEffect(() => {
+  // Resets answer state for whichever challenge is about to become active.
+  // Called explicitly from onContinue (not a useEffect keyed on challenge?.id):
+  // when the queue has a single item, a wrong answer rotates it back to the
+  // same id, so an id-keyed effect would never re-fire and old answer state
+  // (and the ARRANGE pre-fill below) would wrongly survive into the retry.
+  const resetAnswerStateFor = (upcoming?: typeof initialLessonChallenges[number]) => {
     setSelectedOption(undefined);
     setWrittenAnswer("");
-    setArrangedTileIds([]);
     setHasPlayedAudio(false);
-  }, [challenge?.id]);
+
+    const upcomingOptions = upcoming?.challengeOptions ?? [];
+    if (upcoming?.type === "ARRANGE" && (wrongAttempts[upcoming.id] ?? 0) >= 1) {
+      const correctIds = upcomingOptions.filter((o) => o.correct).map((o) => o.id).sort((a, b) => a - b);
+      setArrangedTileIds(correctIds.length > 0 ? [correctIds[0]] : []);
+    } else {
+      setArrangedTileIds([]);
+    }
+  };
 
   // Starts in DB order so the server-rendered markup matches the first
   // client paint; the shuffle below only runs post-hydration, so it never
@@ -192,6 +202,7 @@ export const Quiz = ({
     if (!isAnswerReady) return;
 
     if (status === "wrong") {
+      resetAnswerStateFor(queue.length > 1 ? queue[1] : queue[0]);
       setQueue((prev) => [...prev.slice(1), prev[0]]);
       setStatus("none");
       setRevealedAnswer(undefined);
@@ -199,6 +210,7 @@ export const Quiz = ({
     }
 
     if (status === "correct") {
+      resetAnswerStateFor(queue[1]);
       setQueue((prev) => prev.slice(1));
       setStatus("none");
       return;
