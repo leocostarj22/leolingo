@@ -24,25 +24,24 @@ export const Card = ({
     <div
       onClick={() => onClick(id)}
       className={cn(
-        "h-full border-2 rounded-xl border-b-4 hover:bg-black/5 cursor-pointer active:border-b-2 flex flex-col items-center justify-between p-3 pb-6 min-h-[217px] min-w-[200px]",
-        disabled && "pointer-events-none opacity-50"
+        "relative flex h-full min-h-[160px] cursor-pointer flex-col items-center justify-center gap-y-3 rounded-2xl border-2 border-slate-100 bg-white p-4 shadow-sm transition hover:shadow-md",
+        active && "border-emerald-400 bg-emerald-50",
+        disabled && "pointer-events-none opacity-50",
       )}
     >
-      <div className="min-[24px] w-full flex items-center justify-end">
-        {active && (
-          <div className="rounded-md bg-green-600 flex items-center justify-center p-1.5">
-            <Check className="text-white stroke-[4] h-4 w-4" />
-          </div>
-        )}
-      </div>
+      {active && (
+        <div className="absolute right-3 top-3 flex h-6 w-6 items-center justify-center rounded-full bg-emerald-500">
+          <Check className="h-4 w-4 stroke-[4] text-white" />
+        </div>
+      )}
       <Image
         src={imageSrc}
         alt={title}
-        height={70}
-        width={93.33}
-        className="rounded-lg drop-shadow-md border object-cover"
+        height={56}
+        width={84}
+        className="rounded-md object-cover drop-shadow-sm"
       />
-      <p className="text-neutral-700 text-center font-bold mt-3">
+      <p className="text-center font-bold text-slate-800">
         {title}
       </p>
     </div>
