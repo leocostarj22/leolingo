@@ -43,6 +43,7 @@ export const Unit = ({
               current={isCurrent}
               locked={isLocked}
               percentage={activeLessonPercentage}
+              isBonus={lesson.isBonus}
             />
           );
         })}

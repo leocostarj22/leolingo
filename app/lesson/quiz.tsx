@@ -22,6 +22,7 @@ import { ResultCard } from "./result-card";
 import { QuestionBubble } from "./question-bubble";
 import { WriteChallenge } from "./write-challenge";
 import { ArrangeChallenge } from "./arrange-challenge";
+import { Dialogue } from "./dialogue";
 
 type Props ={
   initialPercentage: number;
@@ -94,6 +95,7 @@ export const Quiz = ({
 
   const isAnswerReady = (() => {
     if (challenge?.type === "WRITE") return writtenAnswer.trim().length > 0;
+    if (challenge?.type === "DIALOGUE") return true;
     if (challenge?.type === "ARRANGE") return arrangedTileIds.length > 0;
     return !!selectedOption;
   })();
@@ -103,6 +105,7 @@ export const Quiz = ({
       const accepted = options.filter((o) => o.correct).map((o) => normalizeAnswer(o.text));
       return accepted.includes(normalizeAnswer(writtenAnswer));
     }
+    if (challenge.type === "DIALOGUE") return true;
     if (challenge.type === "ARRANGE") {
       const correctIds = options.filter((o) => o.correct).map((o) => o.id).sort((a, b) => a - b);
       return (
@@ -244,7 +247,9 @@ export const Quiz = ({
     );
   }
 
-  const title = challenge.type === "ASSIST" 
+  const title = challenge.type === "DIALOGUE"
+    ? "Read the dialogue"
+    : challenge.type === "ASSIST"
     ? "Select the correct meaning"
     : challenge.question;
 
@@ -282,6 +287,8 @@ export const Quiz = ({
                   status={status}
                   disabled={pending}
                 />
+              ) : challenge.type === "DIALOGUE" ? (
+                <Dialogue script={challenge.question} />
               ) : (
                 <Challenge
                   options={options}

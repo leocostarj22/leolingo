@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Check, Crown, Star } from "lucide-react";
+import { Check, Crown, Star, Zap } from "lucide-react";
 import { CircularProgressbarWithChildren } from "react-circular-progressbar";
 
 import { cn } from "@/lib/utils";
@@ -16,6 +16,7 @@ type Props = {
   locked?: boolean;
   current?: boolean;
   percentage: number;
+  isBonus?: boolean;
 };
 
 export const LessonButton = ({
@@ -24,7 +25,8 @@ export const LessonButton = ({
   totalCount,
   locked,
   current,
-  percentage
+  percentage,
+  isBonus,
 }: Props) => {
   const cycleLength = 8;
   const cycleIndex = index % cycleLength;
@@ -47,7 +49,7 @@ export const LessonButton = ({
   const isLast = index === totalCount;
   const isCompleted = !current && !locked;
 
-  const Icon = isCompleted ? Check : isLast ? Crown : Star;
+  const Icon = isCompleted ? Check : isBonus ? Zap : isLast ? Crown : Star;
 
   const href = isCompleted ? `/lesson/${id}` : "/lesson";
 
