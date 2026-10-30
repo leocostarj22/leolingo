@@ -23,7 +23,10 @@ export const upsertChallengeProgress = async (challengeId: number) => {
   }
 
   const challenge = await db.query.challenges.findFirst({
-    where: eq(challenges.id, challengeId)
+    where: eq(challenges.id, challengeId),
+    with: {
+      lesson: true,
+    },
   });
 
   if (!challenge) {
@@ -31,6 +34,7 @@ export const upsertChallengeProgress = async (challengeId: number) => {
   }
 
   const lessonId = challenge.lessonId;
+  const pointsAwarded = challenge.lesson?.isBonus ? 20 : 10;
 
   const existingChallengeProgress = await db.query.challengeProgress.findFirst({
     where: and(
@@ -59,7 +63,7 @@ export const upsertChallengeProgress = async (challengeId: number) => {
 
     await db.update(userProgress).set({
       hearts: Math.min(currentUserProgress.hearts + 1, 5),
-      points: currentUserProgress.points + 10,
+      points: currentUserProgress.points + pointsAwarded,
     }).where(eq(userProgress.userId, userId));
 
     revalidatePath("/learn");
@@ -77,7 +81,7 @@ export const upsertChallengeProgress = async (challengeId: number) => {
   });
 
   await db.update(userProgress).set({
-    points: currentUserProgress.points + 10,
+    points: currentUserProgress.points + pointsAwarded,
   }).where(eq(userProgress.userId, userId));
 
   revalidatePath("/learn");
