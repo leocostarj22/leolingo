@@ -4,7 +4,7 @@ import { toast } from "sonner";
 import Image from "next/image";
 import Confetti from "react-confetti";
 import { useRouter } from "next/navigation";
-import { useState, useTransition } from "react";
+import { useMemo, useState, useTransition } from "react";
 import { useAudio, useWindowSize, useMount } from "react-use";
 
 import { reduceHearts } from "@/actions/user-progress";
@@ -23,6 +23,7 @@ import { QuestionBubble } from "./question-bubble";
 import { WriteChallenge } from "./write-challenge";
 import { ArrangeChallenge } from "./arrange-challenge";
 import { Dialogue } from "./dialogue";
+import { AudioPrompt } from "./audio-prompt";
 
 type Props ={
   initialPercentage: number;
@@ -79,7 +80,12 @@ export const Quiz = ({
   const [percentage, setPercentage] = useState(() => {
     return initialPercentage === 100 ? 0 : initialPercentage;
   });
-  const [challenges] = useState(initialLessonChallenges);
+  const [challenges] = useState(() => {
+    const withoutAudio = initialLessonChallenges.filter((c) => !c.audioSrc);
+    const withAudio = initialLessonChallenges.filter((c) => c.audioSrc);
+    const shuffle = <T,>(arr: T[]) => [...arr].sort(() => Math.random() - 0.5);
+    return [...shuffle(withoutAudio), ...shuffle(withAudio)];
+  });
   const [activeIndex, setActiveIndex] = useState(() => {
     const uncompletedIndex = challenges.findIndex((challenge) => !challenge.completed);
     return uncompletedIndex === -1 ? 0 : uncompletedIndex;
@@ -89,14 +95,20 @@ export const Quiz = ({
   const [status, setStatus] = useState<"correct" | "wrong" | "none">("none");
   const [writtenAnswer, setWrittenAnswer] = useState("");
   const [arrangedTileIds, setArrangedTileIds] = useState<number[]>([]);
+  const [hasPlayedAudio, setHasPlayedAudio] = useState(false);
 
   const challenge = challenges[activeIndex];
   const options = challenge?.challengeOptions ?? [];
 
+  const shuffledOptions = useMemo(() => {
+    return [...options].sort(() => Math.random() - 0.5);
+  }, [options]);
+
   const isAnswerReady = (() => {
+    if (challenge?.audioSrc && !hasPlayedAudio) return false;
     if (challenge?.type === "WRITE") return writtenAnswer.trim().length > 0;
-    if (challenge?.type === "DIALOGUE") return true;
     if (challenge?.type === "ARRANGE") return arrangedTileIds.length > 0;
+    if (challenge?.type === "DIALOGUE") return true;
     return !!selectedOption;
   })();
 
@@ -142,6 +154,7 @@ export const Quiz = ({
       setSelectedOption(undefined);
       setWrittenAnswer("");
       setArrangedTileIds([]);
+      setHasPlayedAudio(false);
       return;
     }
 
@@ -151,6 +164,7 @@ export const Quiz = ({
       setSelectedOption(undefined);
       setWrittenAnswer("");
       setArrangedTileIds([]);
+      setHasPlayedAudio(false);
       return;
     }
 
@@ -265,9 +279,17 @@ export const Quiz = ({
       <div className="flex-1">
         <div className="h-full flex items-center justify-center">
           <div className="lg:min-h-[350px] lg:w-[600px] w-full px-6 lg:px-0 flex flex-col gap-y-12">
-            <h1 className="text-lg lg:text-3xl text-center lg:text-start font-bold text-neutral-700">
-              {title}
-            </h1>
+            {challenge.audioSrc ? (
+              <AudioPrompt
+                key={challenge.id}
+                src={challenge.audioSrc}
+                onPlayed={() => setHasPlayedAudio(true)}
+              />
+            ) : (
+              <h1 className="text-lg lg:text-3xl text-center lg:text-start font-bold text-neutral-700">
+                {title}
+              </h1>
+            )}
             <div>
               {challenge.type === "ASSIST" && (
                 <QuestionBubble question={challenge.question} />
@@ -291,7 +313,7 @@ export const Quiz = ({
                 <Dialogue script={challenge.question} />
               ) : (
                 <Challenge
-                  options={options}
+                  options={shuffledOptions}
                   onSelect={onSelect}
                   status={status}
                   selectedOption={selectedOption}
