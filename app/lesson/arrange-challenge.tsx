@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useEffect, useState } from "react";
 
 import { cn } from "@/lib/utils";
 import { challengeOptions } from "@/db/schema";
@@ -12,8 +12,12 @@ type Props = {
 };
 
 export const ArrangeChallenge = ({ options, selectedIds, onToggle, status, disabled }: Props) => {
-  const bankOrder = useMemo(() => {
-    return [...options].sort(() => Math.random() - 0.5).map((o) => o.id);
+  // Starts in DB order so the server-rendered markup matches the first
+  // client paint; the shuffle below only runs post-hydration, so it never
+  // triggers a hydration mismatch.
+  const [bankOrder, setBankOrder] = useState(() => options.map((o) => o.id));
+  useEffect(() => {
+    setBankOrder([...options].sort(() => Math.random() - 0.5).map((o) => o.id));
   }, [options]);
 
   const byId = new Map(options.map((o) => [o.id, o]));

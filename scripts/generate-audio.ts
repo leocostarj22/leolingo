@@ -9,7 +9,7 @@ export const generateAudio = async (items: { slug: string; text: string }[]) => 
     fs.mkdirSync(AUDIO_DIR, { recursive: true });
   }
 
-  const tts = new EdgeTTS({ voice: "en-US-AvaNeural" });
+  const tts = new EdgeTTS({ voice: "en-US-AvaNeural", lang: "en-US" });
 
   for (const item of items) {
     const filePath = path.join(AUDIO_DIR, `${item.slug}.mp3`);

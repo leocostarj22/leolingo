@@ -255,8 +255,10 @@ const bonusLessonsContent: BonusLessonContent[] = [
   },
 ];
 
-const insertIntoExistingLesson = async (content: ExistingLessonContent) => {
-  const [lessonRow] = await db
+type Database = typeof db;
+
+const insertIntoExistingLesson = async (tx: Database, content: ExistingLessonContent) => {
+  const [lessonRow] = await tx
     .select({ id: schema.lessons.id })
     .from(schema.lessons)
     .innerJoin(schema.units, eq(schema.lessons.unitId, schema.units.id))
@@ -270,14 +272,14 @@ const insertIntoExistingLesson = async (content: ExistingLessonContent) => {
     throw new Error(`Lesson not found: ${content.lessonTitle}`);
   }
 
-  const [{ maxOrder }] = await db
+  const [{ maxOrder }] = await tx
     .select({ maxOrder: sql<number>`coalesce(max(${schema.challenges.order}), 0)` })
     .from(schema.challenges)
     .where(eq(schema.challenges.lessonId, lessonRow.id));
 
   let challengeOrder = maxOrder + 1;
   for (const challenge of content.challenges) {
-    const [challengeRow] = await db.insert(schema.challenges).values({
+    const [challengeRow] = await tx.insert(schema.challenges).values({
       lessonId: lessonRow.id,
       type: challenge.type,
       question: challenge.question,
@@ -286,7 +288,7 @@ const insertIntoExistingLesson = async (content: ExistingLessonContent) => {
     }).returning();
 
     if (challenge.options.length > 0) {
-      await db.insert(schema.challengeOptions).values(
+      await tx.insert(schema.challengeOptions).values(
         challenge.options.map((option) => ({
           challengeId: challengeRow.id,
           text: option.text,
@@ -297,8 +299,8 @@ const insertIntoExistingLesson = async (content: ExistingLessonContent) => {
   }
 };
 
-const insertBonusLesson = async (content: BonusLessonContent) => {
-  const [unitRow] = await db
+const insertBonusLesson = async (tx: Database, content: BonusLessonContent) => {
+  const [unitRow] = await tx
     .select({ id: schema.units.id })
     .from(schema.units)
     .innerJoin(schema.courses, eq(schema.units.courseId, schema.courses.id))
@@ -311,7 +313,7 @@ const insertBonusLesson = async (content: BonusLessonContent) => {
     throw new Error(`Unit not found: ${content.unitTitle}`);
   }
 
-  const [lessonRow] = await db.insert(schema.lessons).values({
+  const [lessonRow] = await tx.insert(schema.lessons).values({
     unitId: unitRow.id,
     title: content.title,
     order: 5,
@@ -320,7 +322,7 @@ const insertBonusLesson = async (content: BonusLessonContent) => {
 
   let challengeOrder = 1;
   for (const challenge of content.challenges) {
-    const [challengeRow] = await db.insert(schema.challenges).values({
+    const [challengeRow] = await tx.insert(schema.challenges).values({
       lessonId: lessonRow.id,
       type: challenge.type,
       question: challenge.question,
@@ -329,7 +331,7 @@ const insertBonusLesson = async (content: BonusLessonContent) => {
     }).returning();
 
     if (challenge.options.length > 0) {
-      await db.insert(schema.challengeOptions).values(
+      await tx.insert(schema.challengeOptions).values(
         challenge.options.map((option) => ({
           challengeId: challengeRow.id,
           text: option.text,
@@ -342,18 +344,29 @@ const insertBonusLesson = async (content: BonusLessonContent) => {
 
 const main = async () => {
   try {
+    const alreadySeeded = await db.query.lessons.findFirst({
+      where: eq(schema.lessons.isBonus, true),
+    });
+
+    if (alreadySeeded) {
+      console.log("Interactive content already seeded, skipping.");
+      return;
+    }
+
     console.log("Generating audio...");
     await generateAudio(audioItems);
 
-    console.log("Inserting WRITE/ARRANGE content into existing lessons...");
-    for (const content of existingLessonsContent) {
-      await insertIntoExistingLesson(content);
-    }
+    await db.transaction(async (tx) => {
+      console.log("Inserting WRITE/ARRANGE content into existing lessons...");
+      for (const content of existingLessonsContent) {
+        await insertIntoExistingLesson(tx, content);
+      }
 
-    console.log("Inserting bonus dialogue lessons...");
-    for (const content of bonusLessonsContent) {
-      await insertBonusLesson(content);
-    }
+      console.log("Inserting bonus dialogue lessons...");
+      for (const content of bonusLessonsContent) {
+        await insertBonusLesson(tx, content);
+      }
+    });
 
     console.log("Interactive content inserted.");
   } catch (error) {

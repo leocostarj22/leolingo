@@ -4,7 +4,7 @@ import { toast } from "sonner";
 import Image from "next/image";
 import Confetti from "react-confetti";
 import { useRouter } from "next/navigation";
-import { useMemo, useState, useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
 import { useAudio, useWindowSize, useMount } from "react-use";
 
 import { reduceHearts } from "@/actions/user-progress";
@@ -30,6 +30,7 @@ type Props ={
   initialHearts: number;
   initialLessonId: number;
   initialGender: typeof userProgress.$inferSelect["gender"];
+  initialIsBonus: boolean;
   initialLessonChallenges: (typeof challenges.$inferSelect & {
     completed: boolean;
     challengeOptions: typeof challengeOptions.$inferSelect[];
@@ -44,6 +45,7 @@ export const Quiz = ({
   initialHearts,
   initialLessonId,
   initialGender,
+  initialIsBonus,
   initialLessonChallenges,
   userSubscription,
 }: Props) => {
@@ -80,12 +82,7 @@ export const Quiz = ({
   const [percentage, setPercentage] = useState(() => {
     return initialPercentage === 100 ? 0 : initialPercentage;
   });
-  const [challenges] = useState(() => {
-    const withoutAudio = initialLessonChallenges.filter((c) => !c.audioSrc);
-    const withAudio = initialLessonChallenges.filter((c) => c.audioSrc);
-    const shuffle = <T,>(arr: T[]) => [...arr].sort(() => Math.random() - 0.5);
-    return [...shuffle(withoutAudio), ...shuffle(withAudio)];
-  });
+  const [challenges] = useState(initialLessonChallenges);
   const [activeIndex, setActiveIndex] = useState(() => {
     const uncompletedIndex = challenges.findIndex((challenge) => !challenge.completed);
     return uncompletedIndex === -1 ? 0 : uncompletedIndex;
@@ -100,8 +97,12 @@ export const Quiz = ({
   const challenge = challenges[activeIndex];
   const options = challenge?.challengeOptions ?? [];
 
-  const shuffledOptions = useMemo(() => {
-    return [...options].sort(() => Math.random() - 0.5);
+  // Starts in DB order so the server-rendered markup matches the first
+  // client paint; the shuffle below only runs post-hydration, so it never
+  // triggers a hydration mismatch.
+  const [shuffledOptions, setShuffledOptions] = useState(options);
+  useEffect(() => {
+    setShuffledOptions([...options].sort(() => Math.random() - 0.5));
   }, [options]);
 
   const isAnswerReady = (() => {
@@ -147,6 +148,7 @@ export const Quiz = ({
   };
 
   const onContinue = () => {
+    if (pending) return;
     if (!isAnswerReady) return;
 
     if (status === "wrong") {
@@ -244,7 +246,7 @@ export const Quiz = ({
           <div className="flex items-center gap-x-4 w-full">
             <ResultCard
               variant="points"
-              value={challenges.length * 10}
+              value={challenges.length * (initialIsBonus ? 20 : 10)}
             />
             <ResultCard
               variant="hearts"
