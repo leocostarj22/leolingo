@@ -14,11 +14,13 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { useExitModal } from "@/store/use-exit-modal";
+import { useMascot } from "@/store/use-mascot";
 
 export const ExitModal = () => {
   const router = useRouter();
   const [isClient, setIsClient] = useState(false);
   const { isOpen, close } = useExitModal();
+  const gender = useMascot((state) => state.gender);
 
   useEffect(() => setIsClient(true), []);
 
@@ -32,7 +34,7 @@ export const ExitModal = () => {
         <DialogHeader>
           <div className="flex items-center w-full justify-center mb-5">
             <Image
-              src="/mascot_sad.svg"
+              src={gender === "FEMALE" ? "/juba.png" : "/leo.png"}
               alt="Mascot"
               height={80}
               width={80}

@@ -8,8 +8,9 @@ import { useState, useTransition } from "react";
 import { useAudio, useWindowSize, useMount } from "react-use";
 
 import { reduceHearts } from "@/actions/user-progress";
+import { useMascot } from "@/store/use-mascot";
 import { useHeartsModal } from "@/store/use-hearts-modal";
-import { challengeOptions, challenges, userSubscription } from "@/db/schema";
+import { challengeOptions, challenges, userProgress, userSubscription } from "@/db/schema";
 import { usePracticeModal } from "@/store/use-practice-modal";
 import { upsertChallengeProgress } from "@/actions/challenge-progress";
 
@@ -23,6 +24,7 @@ type Props ={
   initialPercentage: number;
   initialHearts: number;
   initialLessonId: number;
+  initialGender: typeof userProgress.$inferSelect["gender"];
   initialLessonChallenges: (typeof challenges.$inferSelect & {
     completed: boolean;
     challengeOptions: typeof challengeOptions.$inferSelect[];
@@ -36,6 +38,7 @@ export const Quiz = ({
   initialPercentage,
   initialHearts,
   initialLessonId,
+  initialGender,
   initialLessonChallenges,
   userSubscription,
 }: Props) => {
@@ -43,6 +46,8 @@ export const Quiz = ({
   const { open: openPracticeModal } = usePracticeModal();
 
   useMount(() => {
+    useMascot.getState().setGender(initialGender);
+
     if (initialPercentage === 100) {
       openPracticeModal();
     }

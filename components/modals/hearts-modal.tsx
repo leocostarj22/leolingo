@@ -14,11 +14,13 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { useHeartsModal } from "@/store/use-hearts-modal";
+import { useMascot } from "@/store/use-mascot";
 
 export const HeartsModal = () => {
   const router = useRouter();
   const [isClient, setIsClient] = useState(false);
   const { isOpen, close } = useHeartsModal();
+  const gender = useMascot((state) => state.gender);
 
   useEffect(() => setIsClient(true), []);
 
@@ -37,7 +39,7 @@ export const HeartsModal = () => {
         <DialogHeader>
           <div className="flex items-center w-full justify-center mb-5">
             <Image
-              src="/mascot_bad.svg"
+              src={gender === "FEMALE" ? "/juba.png" : "/leo.png"}
               alt="Mascot"
               height={80}
               width={80}

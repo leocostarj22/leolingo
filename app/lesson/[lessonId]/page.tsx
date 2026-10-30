@@ -41,6 +41,7 @@ const LessonIdPage = async ({
       initialLessonChallenges={lesson.challenges}
       initialHearts={userProgress.hearts}
       initialPercentage={initialPercentage}
+      initialGender={userProgress.gender}
       userSubscription={userSubscription}
     />
   );

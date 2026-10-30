@@ -1,21 +1,26 @@
 import Image from "next/image";
 
+import { useMascot } from "@/store/use-mascot";
+
 type Props = {
   question: string;
 };
 
 export const QuestionBubble = ({ question }: Props) => {
+  const gender = useMascot((state) => state.gender);
+  const mascotSrc = gender === "FEMALE" ? "/juba.png" : "/leo.png";
+
   return (
     <div className="flex items-center gap-x-4 mb-6">
       <Image
-        src="/mascot.svg"
+        src={mascotSrc}
         alt="Mascot"
         height={60}
         width={60}
         className="hidden lg:block"
       />
       <Image
-        src="/mascot.svg"
+        src={mascotSrc}
         alt="Mascot"
         height={40}
         width={40}
