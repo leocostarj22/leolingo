@@ -1,5 +1,5 @@
 import { cache } from "react";
-import { eq } from "drizzle-orm";
+import { and, eq, isNull, or } from "drizzle-orm";
 import { auth } from "@clerk/nextjs";
 
 import db from "@/db/drizzle";
@@ -29,6 +29,22 @@ export const getUserProgress = cache(async () => {
   return data;
 });
 
+type EnglishLevel = NonNullable<typeof userProgress.$inferSelect["englishLevel"]>;
+type LearningGoal = NonNullable<typeof userProgress.$inferSelect["learningGoal"]>;
+
+const buildUnitsWhereClause = (
+  courseId: number,
+  level: EnglishLevel,
+  goal: LearningGoal | null,
+) => {
+  const levelMatch = or(isNull(units.targetLevel), eq(units.targetLevel, level));
+  const goalMatch = goal
+    ? or(isNull(units.targetGoal), eq(units.targetGoal, goal))
+    : isNull(units.targetGoal);
+
+  return and(eq(units.courseId, courseId), levelMatch, goalMatch);
+};
+
 export const getUnits = cache(async () => {
   const { userId } = await auth();
   const userProgress = await getUserProgress();
@@ -39,7 +55,11 @@ export const getUnits = cache(async () => {
 
   const data = await db.query.units.findMany({
     orderBy: (units, { asc }) => [asc(units.order)],
-    where: eq(units.courseId, userProgress.activeCourseId),
+    where: buildUnitsWhereClause(
+      userProgress.activeCourseId,
+      userProgress.englishLevel ?? "BASIC",
+      userProgress.learningGoal,
+    ),
     with: {
       lessons: {
         orderBy: (lessons, { asc }) => [asc(lessons.order)],
@@ -117,7 +137,11 @@ export const getCourseProgress = cache(async () => {
 
   const unitsInActiveCourse = await db.query.units.findMany({
     orderBy: (units, { asc }) => [asc(units.order)],
-    where: eq(units.courseId, userProgress.activeCourseId),
+    where: buildUnitsWhereClause(
+      userProgress.activeCourseId,
+      userProgress.englishLevel ?? "BASIC",
+      userProgress.learningGoal,
+    ),
     with: {
       lessons: {
         orderBy: (lessons, { asc }) => [asc(lessons.order)],
