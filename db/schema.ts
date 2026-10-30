@@ -12,12 +12,22 @@ export const coursesRelations = relations(courses, ({ many }) => ({
   units: many(units),
 }));
 
+export const challengesEnum = pgEnum("type", ["SELECT", "ASSIST"]);
+
+export const genderEnum = pgEnum("gender", ["MALE", "FEMALE"]);
+
+export const englishLevelEnum = pgEnum("english_level", ["BEGINNER", "BASIC", "INTERMEDIATE", "ADVANCED"]);
+
+export const learningGoalEnum = pgEnum("learning_goal", ["TRAVEL", "WORK", "STUDY_ABROAD", "SPEAK_CONFIDENTLY", "OTHER"]);
+
 export const units = pgTable("units", {
   id: serial("id").primaryKey(),
   title: text("title").notNull(), // Unit 1
   description: text("description").notNull(), // Learn the basics of spanish
   courseId: integer("course_id").references(() => courses.id, { onDelete: "cascade" }).notNull(),
   order: integer("order").notNull(),
+  targetLevel: englishLevelEnum("target_level"),
+  targetGoal: learningGoalEnum("target_goal"),
 });
 
 export const unitsRelations = relations(units, ({ many, one }) => ({
@@ -42,14 +52,6 @@ export const lessonsRelations = relations(lessons, ({ one, many }) => ({
   }),
   challenges: many(challenges),
 }));
-
-export const challengesEnum = pgEnum("type", ["SELECT", "ASSIST"]);
-
-export const genderEnum = pgEnum("gender", ["MALE", "FEMALE"]);
-
-export const englishLevelEnum = pgEnum("english_level", ["BEGINNER", "BASIC", "INTERMEDIATE", "ADVANCED"]);
-
-export const learningGoalEnum = pgEnum("learning_goal", ["TRAVEL", "WORK", "STUDY_ABROAD", "SPEAK_CONFIDENTLY", "OTHER"]);
 
 export const challenges = pgTable("challenges", {
   id: serial("id").primaryKey(),
