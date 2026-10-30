@@ -129,6 +129,14 @@ export const Quiz = ({
       ? options.find((o) => !o.correct)?.id
       : undefined;
 
+  const writeHint = (() => {
+    if (challenge?.type !== "WRITE" || (wrongAttempts[challenge.id] ?? 0) < 1) return undefined;
+    const accepted = options.filter((o) => o.correct)[0];
+    if (!accepted) return undefined;
+    const wordCount = accepted.text.trim().split(/\s+/).length;
+    return `Começa por "${accepted.text[0].toUpperCase()}..." e tem ${wordCount} ${wordCount === 1 ? "palavra" : "palavras"}.`;
+  })();
+
   const isAnswerReady = (() => {
     if (challenge?.audioSrc && !hasPlayedAudio) return false;
     if (challenge?.type === "WRITE") return writtenAnswer.trim().length > 0;
@@ -334,6 +342,7 @@ export const Quiz = ({
                   onChange={setWrittenAnswer}
                   status={status}
                   disabled={pending}
+                  hint={writeHint}
                 />
               ) : challenge.type === "ARRANGE" ? (
                 <ArrangeChallenge
