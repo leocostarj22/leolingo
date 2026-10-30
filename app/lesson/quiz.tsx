@@ -21,6 +21,7 @@ import { Challenge } from "./challenge";
 import { ResultCard } from "./result-card";
 import { QuestionBubble } from "./question-bubble";
 import { WriteChallenge } from "./write-challenge";
+import { ArrangeChallenge } from "./arrange-challenge";
 
 type Props ={
   initialPercentage: number;
@@ -86,12 +87,14 @@ export const Quiz = ({
   const [selectedOption, setSelectedOption] = useState<number>();
   const [status, setStatus] = useState<"correct" | "wrong" | "none">("none");
   const [writtenAnswer, setWrittenAnswer] = useState("");
+  const [arrangedTileIds, setArrangedTileIds] = useState<number[]>([]);
 
   const challenge = challenges[activeIndex];
   const options = challenge?.challengeOptions ?? [];
 
   const isAnswerReady = (() => {
     if (challenge?.type === "WRITE") return writtenAnswer.trim().length > 0;
+    if (challenge?.type === "ARRANGE") return arrangedTileIds.length > 0;
     return !!selectedOption;
   })();
 
@@ -99,6 +102,13 @@ export const Quiz = ({
     if (challenge.type === "WRITE") {
       const accepted = options.filter((o) => o.correct).map((o) => normalizeAnswer(o.text));
       return accepted.includes(normalizeAnswer(writtenAnswer));
+    }
+    if (challenge.type === "ARRANGE") {
+      const correctIds = options.filter((o) => o.correct).map((o) => o.id).sort((a, b) => a - b);
+      return (
+        arrangedTileIds.length === correctIds.length &&
+        arrangedTileIds.every((id, i) => id === correctIds[i])
+      );
     }
     const correctOption = options.find((option) => option.correct);
     return !!correctOption && correctOption.id === selectedOption;
@@ -114,6 +124,13 @@ export const Quiz = ({
     setSelectedOption(id);
   };
 
+  const onToggleTile = (id: number) => {
+    if (status !== "none") return;
+    setArrangedTileIds((prev) =>
+      prev.includes(id) ? prev.filter((tileId) => tileId !== id) : [...prev, id]
+    );
+  };
+
   const onContinue = () => {
     if (!isAnswerReady) return;
 
@@ -121,6 +138,7 @@ export const Quiz = ({
       setStatus("none");
       setSelectedOption(undefined);
       setWrittenAnswer("");
+      setArrangedTileIds([]);
       return;
     }
 
@@ -129,6 +147,7 @@ export const Quiz = ({
       setStatus("none");
       setSelectedOption(undefined);
       setWrittenAnswer("");
+      setArrangedTileIds([]);
       return;
     }
 
@@ -252,6 +271,14 @@ export const Quiz = ({
                 <WriteChallenge
                   value={writtenAnswer}
                   onChange={setWrittenAnswer}
+                  status={status}
+                  disabled={pending}
+                />
+              ) : challenge.type === "ARRANGE" ? (
+                <ArrangeChallenge
+                  options={options}
+                  selectedIds={arrangedTileIds}
+                  onToggle={onToggleTile}
                   status={status}
                   disabled={pending}
                 />
