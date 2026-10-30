@@ -133,14 +133,22 @@ export const Quiz = ({
     setShuffledOptions([...options].sort(() => Math.random() - 0.5));
   }, [options]);
 
+  // Misses before this in-flight result: wrongAttempts[id] already counts a
+  // miss that just happened (incremented in the same update that sets
+  // status to "wrong"), so subtracting that one keeps hints off the very
+  // screen reporting the first miss — they only turn on once the challenge
+  // comes back around (status resets to "none").
+  const priorMisses = challenge
+    ? (wrongAttempts[challenge.id] ?? 0) - (status === "wrong" ? 1 : 0)
+    : 0;
+
   const eliminatedOptionId =
-    (challenge?.type === "SELECT" || challenge?.type === "ASSIST") &&
-    (wrongAttempts[challenge.id] ?? 0) >= 1
+    (challenge?.type === "SELECT" || challenge?.type === "ASSIST") && priorMisses >= 1
       ? options.find((o) => !o.correct)?.id
       : undefined;
 
   const writeHint = (() => {
-    if (challenge?.type !== "WRITE" || (wrongAttempts[challenge.id] ?? 0) < 1) return undefined;
+    if (challenge?.type !== "WRITE" || priorMisses < 1) return undefined;
     const accepted = options.filter((o) => o.correct)[0];
     if (!accepted) return undefined;
     const wordCount = accepted.text.trim().split(/\s+/).length;
