@@ -123,6 +123,12 @@ export const Quiz = ({
     setShuffledOptions([...options].sort(() => Math.random() - 0.5));
   }, [options]);
 
+  const eliminatedOptionId =
+    (challenge?.type === "SELECT" || challenge?.type === "ASSIST") &&
+    (wrongAttempts[challenge.id] ?? 0) >= 1
+      ? options.find((o) => !o.correct)?.id
+      : undefined;
+
   const isAnswerReady = (() => {
     if (challenge?.audioSrc && !hasPlayedAudio) return false;
     if (challenge?.type === "WRITE") return writtenAnswer.trim().length > 0;
@@ -347,6 +353,7 @@ export const Quiz = ({
                   selectedOption={selectedOption}
                   disabled={pending}
                   type={challenge.type}
+                  eliminatedOptionId={eliminatedOptionId}
                 />
               )}
             </div>

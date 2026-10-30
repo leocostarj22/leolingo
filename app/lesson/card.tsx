@@ -16,6 +16,7 @@ type Props = {
   disabled?: boolean;
   status?: "correct" | "wrong" | "none",
   type: typeof challenges.$inferSelect["type"];
+  eliminated?: boolean;
 };
 
 export const Card = ({
@@ -29,15 +30,16 @@ export const Card = ({
   status,
   disabled,
   type,
+  eliminated,
 }: Props) => {
   const [audio, _, controls] = useAudio({ src: audioSrc || "" });
 
   const handleClick = useCallback(() => {
-    if (disabled) return;
+    if (disabled || eliminated) return;
 
     controls.play();
     onClick();
-  }, [disabled, onClick, controls]);
+  }, [disabled, eliminated, onClick, controls]);
 
   useKey(shortcut, handleClick, {}, [handleClick]);
 
@@ -52,6 +54,7 @@ export const Card = ({
         selected && status === "wrong" 
           && "border-rose-300 bg-rose-100 hover:bg-rose-100",
         disabled && "pointer-events-none hover:bg-white",
+        eliminated && "opacity-40 pointer-events-none",
         type === "ASSIST" && "lg:p-3 w-full"
       )}
     >

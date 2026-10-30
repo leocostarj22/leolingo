@@ -10,6 +10,7 @@ type Props = {
   selectedOption?: number;
   disabled?: boolean;
   type: typeof challenges.$inferSelect["type"];
+  eliminatedOptionId?: number;
 };
 
 export const Challenge = ({
@@ -19,6 +20,7 @@ export const Challenge = ({
   selectedOption,
   disabled,
   type,
+  eliminatedOptionId,
 }: Props) => {
   return (
     <div className={cn(
@@ -39,6 +41,7 @@ export const Challenge = ({
           audioSrc={option.audioSrc}
           disabled={disabled}
           type={type}
+          eliminated={option.id === eliminatedOptionId}
         />
       ))}
     </div>
