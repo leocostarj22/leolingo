@@ -12,7 +12,7 @@ export const coursesRelations = relations(courses, ({ many }) => ({
   units: many(units),
 }));
 
-export const challengesEnum = pgEnum("type", ["SELECT", "ASSIST"]);
+export const challengesEnum = pgEnum("type", ["SELECT", "ASSIST", "WRITE", "ARRANGE", "DIALOGUE"]);
 
 export const genderEnum = pgEnum("gender", ["MALE", "FEMALE"]);
 
@@ -43,6 +43,7 @@ export const lessons = pgTable("lessons", {
   title: text("title").notNull(),
   unitId: integer("unit_id").references(() => units.id, { onDelete: "cascade" }).notNull(),
   order: integer("order").notNull(),
+  isBonus: boolean("is_bonus").notNull().default(false),
 });
 
 export const lessonsRelations = relations(lessons, ({ one, many }) => ({
@@ -59,6 +60,7 @@ export const challenges = pgTable("challenges", {
   type: challengesEnum("type").notNull(),
   question: text("question").notNull(),
   order: integer("order").notNull(),
+  audioSrc: text("audio_src"),
 });
 
 export const challengesRelations = relations(challenges, ({ one, many }) => ({
