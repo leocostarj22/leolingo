@@ -79,23 +79,41 @@ export const Quiz = ({
 
   const [lessonId] = useState(initialLessonId);
   const [hearts, setHearts] = useState(initialHearts);
-  const [percentage, setPercentage] = useState(() => {
-    return initialPercentage === 100 ? 0 : initialPercentage;
-  });
-  const [challenges] = useState(initialLessonChallenges);
-  const [activeIndex, setActiveIndex] = useState(() => {
-    const uncompletedIndex = challenges.findIndex((challenge) => !challenge.completed);
-    return uncompletedIndex === -1 ? 0 : uncompletedIndex;
-  });
+
+  const isPracticeSession = initialPercentage === 100;
+
+  const [queue, setQueue] = useState(() =>
+    isPracticeSession
+      ? initialLessonChallenges
+      : initialLessonChallenges.filter((c) => !c.completed)
+  );
+  const [completedIds, setCompletedIds] = useState<Set<number>>(() =>
+    isPracticeSession
+      ? new Set<number>()
+      : new Set(initialLessonChallenges.filter((c) => c.completed).map((c) => c.id))
+  );
+  const [wrongAttempts, setWrongAttempts] = useState<Record<number, number>>({});
+  const totalChallengeCount = initialLessonChallenges.length;
 
   const [selectedOption, setSelectedOption] = useState<number>();
   const [status, setStatus] = useState<"correct" | "wrong" | "none">("none");
   const [writtenAnswer, setWrittenAnswer] = useState("");
   const [arrangedTileIds, setArrangedTileIds] = useState<number[]>([]);
   const [hasPlayedAudio, setHasPlayedAudio] = useState(false);
+  const [revealedAnswer, setRevealedAnswer] = useState<string>();
 
-  const challenge = challenges[activeIndex];
+  const challenge = queue[0];
   const options = challenge?.challengeOptions ?? [];
+  const percentage = (completedIds.size / totalChallengeCount) * 100;
+
+  // Reset per-challenge answer state whenever the active challenge changes
+  // (by advancing or by rotating back after a wrong answer).
+  useEffect(() => {
+    setSelectedOption(undefined);
+    setWrittenAnswer("");
+    setArrangedTileIds([]);
+    setHasPlayedAudio(false);
+  }, [challenge?.id]);
 
   // Starts in DB order so the server-rendered markup matches the first
   // client paint; the shuffle below only runs post-hydration, so it never
@@ -130,8 +148,16 @@ export const Quiz = ({
     return !!correctOption && correctOption.id === selectedOption;
   };
 
-  const onNext = () => {
-    setActiveIndex((current) => current + 1);
+  const getCorrectAnswerText = () => {
+    if (challenge.type === "WRITE") {
+      return options.filter((o) => o.correct)[0]?.text ?? "";
+    }
+    if (challenge.type === "ARRANGE") {
+      const byId = new Map(options.map((o) => [o.id, o]));
+      const correctIds = options.filter((o) => o.correct).map((o) => o.id).sort((a, b) => a - b);
+      return correctIds.map((id) => byId.get(id)?.text).join(" ");
+    }
+    return options.find((o) => o.correct)?.text ?? "";
   };
 
   const onSelect = (id: number) => {
@@ -152,25 +178,20 @@ export const Quiz = ({
     if (!isAnswerReady) return;
 
     if (status === "wrong") {
+      setQueue((prev) => [...prev.slice(1), prev[0]]);
       setStatus("none");
-      setSelectedOption(undefined);
-      setWrittenAnswer("");
-      setArrangedTileIds([]);
-      setHasPlayedAudio(false);
+      setRevealedAnswer(undefined);
       return;
     }
 
     if (status === "correct") {
-      onNext();
+      setQueue((prev) => prev.slice(1));
       setStatus("none");
-      setSelectedOption(undefined);
-      setWrittenAnswer("");
-      setArrangedTileIds([]);
-      setHasPlayedAudio(false);
       return;
     }
 
     if (!isAnswerCorrect()) {
+      const alreadyFailedBefore = (wrongAttempts[challenge.id] ?? 0) >= 1;
       startTransition(() => {
         reduceHearts(challenge.id)
           .then((response) => {
@@ -180,6 +201,11 @@ export const Quiz = ({
             }
 
             incorrectControls.play();
+            setWrongAttempts((prev) => ({
+              ...prev,
+              [challenge.id]: (prev[challenge.id] ?? 0) + 1,
+            }));
+            setRevealedAnswer(alreadyFailedBefore ? getCorrectAnswerText() : undefined);
             setStatus("wrong");
 
             if (!response?.error) {
@@ -201,11 +227,11 @@ export const Quiz = ({
             }
 
             correctControls.play();
+            setCompletedIds((prev) => new Set(prev).add(challenge.id));
             setStatus("correct");
-            setPercentage((prev) => prev + 100 / challenges.length);
 
             // This is a practice
-            if (initialPercentage === 100) {
+            if (isPracticeSession) {
               setHearts((prev) => Math.min(prev + 1, 5));
             }
           })
@@ -246,7 +272,7 @@ export const Quiz = ({
           <div className="flex items-center gap-x-4 w-full">
             <ResultCard
               variant="points"
-              value={challenges.length * (initialIsBonus ? 20 : 10)}
+              value={totalChallengeCount * (initialIsBonus ? 20 : 10)}
             />
             <ResultCard
               variant="hearts"
@@ -331,6 +357,7 @@ export const Quiz = ({
         disabled={pending || !isAnswerReady}
         status={status}
         onCheck={onContinue}
+        revealedAnswer={revealedAnswer}
       />
     </>
   );

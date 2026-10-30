@@ -6,10 +6,10 @@ type OrderableChallenge = {
 
 const shuffle = <T,>(arr: T[]) => [...arr].sort(() => Math.random() - 0.5);
 
-// Completed challenges must stay a prefix: Quiz resumes at the first
-// uncompleted index and then just advances sequentially, so anything
-// uncompleted placed before that index would never be shown, and
-// anything completed placed after it would be replayed (and re-paid).
+// Quiz filters completed challenges out of its rotating queue entirely
+// (except in practice mode, where it replays everything), so their exact
+// position in this array no longer matters for resume — only the relative
+// order of the uncompleted ones does (DIALOGUE first, then shuffled).
 export const orderLessonChallenges = <T extends OrderableChallenge>(challenges: T[]): T[] => {
   const completed = challenges.filter((c) => c.completed);
   const uncompleted = challenges.filter((c) => !c.completed);
