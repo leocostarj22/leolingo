@@ -97,6 +97,7 @@ export const Quiz = ({
       : new Set(initialLessonChallenges.filter((c) => c.completed).map((c) => c.id))
   );
   const [wrongAttempts, setWrongAttempts] = useState<Record<number, number>>({});
+  const [leveledUp, setLeveledUp] = useState(false);
   const totalChallengeCount = initialLessonChallenges.length;
 
   const [selectedOption, setSelectedOption] = useState<number>();
@@ -295,6 +296,10 @@ export const Quiz = ({
               return;
             }
 
+            if (response && "leveledUp" in response && response.leveledUp) {
+              setLeveledUp(true);
+            }
+
             correctControls.play();
             setCompletedIds((prev) => new Set(prev).add(challenge.id));
             setStatus("correct");
@@ -352,7 +357,7 @@ export const Quiz = ({
         <Footer
           lessonId={lessonId}
           status="completed"
-          onCheck={() => router.push("/learn")}
+          onCheck={() => router.push(leveledUp ? "/level-up" : "/learn")}
         />
       </>
     );
