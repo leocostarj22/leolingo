@@ -80,8 +80,21 @@ export const UserEditForm = ({ user, lessons }: UserEditFormProps) => {
   );
 
   const onSaveHeartsAndPoints = () => {
+    if (hearts.trim() === "" || points.trim() === "") {
+      toast.error("Preenche os campos de corações e pontos.");
+      return;
+    }
+
     const heartsValue = Number(hearts);
     const pointsValue = Number(points);
+
+    if (
+      !Number.isInteger(heartsValue) || heartsValue < 0 ||
+      !Number.isInteger(pointsValue) || pointsValue < 0
+    ) {
+      toast.error("Corações e pontos têm de ser números inteiros não negativos.");
+      return;
+    }
 
     startTransition(() => {
       updateUserHeartsAndPoints(user.userId, heartsValue, pointsValue)
