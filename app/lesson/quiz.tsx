@@ -16,6 +16,7 @@ import { usePracticeModal } from "@/store/use-practice-modal";
 import { upsertChallengeProgress } from "@/actions/challenge-progress";
 
 import { Header } from "./header";
+import { DialogueHeader } from "./dialogue-header";
 import { Footer } from "./footer";
 import { Challenge } from "./challenge";
 import { ResultCard } from "./result-card";
@@ -334,11 +335,15 @@ export const Quiz = ({
     <>
       {incorrectAudio}
       {correctAudio}
-      <Header
-        hearts={hearts}
-        percentage={percentage}
-        hasActiveSubscription={!!userSubscription?.isActive}
-      />
+      {challenge.type === "DIALOGUE" ? (
+        <DialogueHeader percentage={percentage} />
+      ) : (
+        <Header
+          hearts={hearts}
+          percentage={percentage}
+          hasActiveSubscription={!!userSubscription?.isActive}
+        />
+      )}
       <div className="flex-1">
         <div className="h-full flex items-center justify-center">
           <div className="lg:min-h-[350px] lg:w-[600px] w-full px-6 lg:px-0 flex flex-col gap-y-12">
