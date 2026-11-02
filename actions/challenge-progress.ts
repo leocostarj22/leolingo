@@ -5,9 +5,10 @@ import { and, eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 
 import db from "@/db/drizzle";
-import { getUserProgress, getUserSubscription } from "@/db/queries";
+import { getUserProgress, getUserSubscription, getUnits } from "@/db/queries";
 import { challengeProgress, challenges, userProgress } from "@/db/schema";
 import { getNextStreak, getTodayDateString } from "@/lib/streak";
+import { getNextLevel, isLevelComplete, type EnglishLevel } from "@/lib/level-up";
 
 export const upsertChallengeProgress = async (challengeId: number, isLastChallenge: boolean) => {
   const { userId } = await auth();
@@ -59,6 +60,19 @@ export const upsertChallengeProgress = async (challengeId: number, isLastChallen
     return { error: "hearts" };
   }
 
+  const computeLevelUpResult = async () => {
+    if (!isLastChallenge) return undefined;
+
+    const nextLevel = getNextLevel(currentUserProgress.englishLevel ?? "BASIC");
+    if (!nextLevel) return undefined;
+
+    const unitsForCurrentLevel = await getUnits();
+    const lessonsForCurrentLevel = unitsForCurrentLevel.flatMap((unit) => unit.lessons);
+    if (!isLevelComplete(lessonsForCurrentLevel)) return undefined;
+
+    return { leveledUp: true as const, newLevel: nextLevel };
+  };
+
   if (isPractice) {
     await db.update(challengeProgress).set({
       completed: true,
@@ -67,10 +81,13 @@ export const upsertChallengeProgress = async (challengeId: number, isLastChallen
       eq(challengeProgress.id, existingChallengeProgress.id)
     );
 
+    const levelUpResult = await computeLevelUpResult();
+
     await db.update(userProgress).set({
       hearts: Math.min(currentUserProgress.hearts + 1, 5),
       points: currentUserProgress.points + pointsAwarded,
       ...(isLastChallenge ? { currentStreak: nextStreak, lastActivityDate: today } : {}),
+      ...(levelUpResult ? { englishLevel: levelUpResult.newLevel } : {}),
     }).where(eq(userProgress.userId, userId));
 
     revalidatePath("/learn");
@@ -78,7 +95,7 @@ export const upsertChallengeProgress = async (challengeId: number, isLastChallen
     revalidatePath("/quests");
     revalidatePath("/leaderboard");
     revalidatePath(`/lesson/${lessonId}`);
-    return;
+    return levelUpResult;
   }
 
   await db.insert(challengeProgress).values({
@@ -87,9 +104,12 @@ export const upsertChallengeProgress = async (challengeId: number, isLastChallen
     completed: true,
   });
 
+  const levelUpResult = await computeLevelUpResult();
+
   await db.update(userProgress).set({
     points: currentUserProgress.points + pointsAwarded,
     ...(isLastChallenge ? { currentStreak: nextStreak, lastActivityDate: today } : {}),
+    ...(levelUpResult ? { englishLevel: levelUpResult.newLevel } : {}),
   }).where(eq(userProgress.userId, userId));
 
   revalidatePath("/learn");
@@ -97,4 +117,5 @@ export const upsertChallengeProgress = async (challengeId: number, isLastChallen
   revalidatePath("/quests");
   revalidatePath("/leaderboard");
   revalidatePath(`/lesson/${lessonId}`);
+  return levelUpResult;
 };

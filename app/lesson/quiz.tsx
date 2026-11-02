@@ -290,7 +290,7 @@ export const Quiz = ({
       startTransition(() => {
         upsertChallengeProgress(challenge.id, queue.length === 1)
           .then((response) => {
-            if (response?.error === "hearts") {
+            if (response && "error" in response && response.error === "hearts") {
               openHeartsModal();
               return;
             }
