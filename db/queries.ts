@@ -1,16 +1,18 @@
 import { cache } from "react";
-import { and, eq, isNull, or } from "drizzle-orm";
+import { and, eq, inArray, isNull, ne, or, sql } from "drizzle-orm";
 import { auth } from "@clerk/nextjs";
 
 import db from "@/db/drizzle";
-import { 
+import {
   challengeProgress,
-  courses, 
-  lessons, 
-  units, 
+  challenges,
+  courses,
+  lessons,
+  units,
   userProgress,
   userSubscription
 } from "@/db/schema";
+import { computePointsAvailable } from "@/lib/points";
 
 export const getUserProgress = cache(async () => {
   const { userId } = await auth();
@@ -101,6 +103,53 @@ export const getUnits = cache(async () => {
   });
 
   return normalizedData;
+});
+
+export const getReviewQueue = cache(async () => {
+  const { userId } = await auth();
+
+  if (!userId) {
+    return { challenges: [], pointsAvailable: 0 };
+  }
+
+  const completedRows = await db
+    .select({ challengeId: challengeProgress.challengeId })
+    .from(challengeProgress)
+    .where(and(
+      eq(challengeProgress.userId, userId),
+      eq(challengeProgress.completed, true),
+    ));
+
+  const completedIds = Array.from(new Set(completedRows.map((row) => row.challengeId)));
+
+  if (completedIds.length === 0) {
+    return { challenges: [], pointsAvailable: 0 };
+  }
+
+  const sampled = await db.query.challenges.findMany({
+    where: and(
+      inArray(challenges.id, completedIds),
+      ne(challenges.type, "DIALOGUE"),
+    ),
+    orderBy: sql`random()`,
+    limit: 10,
+    with: {
+      challengeOptions: true,
+      lesson: {
+        columns: { isBonus: true },
+      },
+    },
+  });
+
+  const reviewChallenges = sampled.map(({ lesson, ...challenge }) => ({
+    ...challenge,
+    completed: true as const,
+  }));
+  const pointsAvailable = computePointsAvailable(
+    sampled.map((challenge) => ({ isBonus: challenge.lesson.isBonus })),
+  );
+
+  return { challenges: reviewChallenges, pointsAvailable };
 });
 
 export const getCourses = cache(async () => {
