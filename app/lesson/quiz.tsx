@@ -4,7 +4,7 @@ import { toast } from "sonner";
 import Image from "next/image";
 import Confetti from "react-confetti";
 import { useRouter } from "next/navigation";
-import { useEffect, useState, useTransition } from "react";
+import { useEffect, useMemo, useState, useTransition } from "react";
 import { useAudio, useWindowSize, useMount } from "react-use";
 
 import { reduceHearts } from "@/actions/user-progress";
@@ -105,7 +105,12 @@ export const Quiz = ({
   const [revealedAnswer, setRevealedAnswer] = useState<string>();
 
   const challenge = queue[0];
-  const options = challenge?.challengeOptions ?? [];
+  // Memoized on `challenge` (not recomputed as a `[]` literal every render):
+  // once the queue empties, `challenge` stays stably `undefined` across
+  // renders, but a bare `?? []` fallback would hand the effect below a new
+  // array reference every time, firing it every render and triggering
+  // "Maximum update depth exceeded" instead of settling on the finish screen.
+  const options = useMemo(() => challenge?.challengeOptions ?? [], [challenge]);
   const percentage = (completedIds.size / totalChallengeCount) * 100;
 
   // Resets answer state for whichever challenge is about to become active.
