@@ -6,13 +6,14 @@ import { ChevronRight } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 
-type Tint = "blue" | "yellow" | "rose" | "green";
+type Tint = "blue" | "yellow" | "rose" | "green" | "purple";
 
 const tintStyles: Record<Tint, { tile: string; active: string }> = {
   blue: { tile: "bg-sky-100", active: "border-sky-300 bg-sky-50" },
   yellow: { tile: "bg-amber-100", active: "border-amber-300 bg-amber-50" },
   rose: { tile: "bg-rose-100", active: "border-rose-300 bg-rose-50" },
   green: { tile: "bg-emerald-100", active: "border-emerald-300 bg-emerald-50" },
+  purple: { tile: "bg-purple-100", active: "border-purple-300 bg-purple-50" },
 };
 
 type Props = {
