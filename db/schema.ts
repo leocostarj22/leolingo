@@ -12,7 +12,7 @@ export const coursesRelations = relations(courses, ({ many }) => ({
   units: many(units),
 }));
 
-export const challengesEnum = pgEnum("type", ["SELECT", "ASSIST", "WRITE", "ARRANGE", "DIALOGUE"]);
+export const challengesEnum = pgEnum("type", ["SELECT", "ASSIST", "WRITE", "ARRANGE", "DIALOGUE", "MATCH"]);
 
 export const genderEnum = pgEnum("gender", ["MALE", "FEMALE"]);
 
