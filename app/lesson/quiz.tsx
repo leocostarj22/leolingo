@@ -413,6 +413,7 @@ export const Quiz = ({
                 />
               ) : challenge.type === "MATCH" ? (
                 <MatchChallenge
+                  key={challenge.id}
                   options={options}
                   pairs={matchPairs}
                   onPair={onPairMatch}

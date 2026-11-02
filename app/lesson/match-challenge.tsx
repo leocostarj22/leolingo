@@ -13,6 +13,16 @@ type Props = {
   disabled?: boolean;
 };
 
+// One fixed colour per row position so a paired PT/EN button always shares
+// its colour — identified by that row's id, never by selection order, so a
+// pair keeps the same colour however it was made or re-made.
+const PAIR_COLORS = [
+  "border-sky-400 bg-sky-100",
+  "border-emerald-400 bg-emerald-100",
+  "border-amber-400 bg-amber-100",
+  "border-violet-400 bg-violet-100",
+];
+
 export const MatchChallenge = ({ options, pairs, onPair, onUnpair, status, disabled }: Props) => {
   // Starts in DB order so the server-rendered markup matches the first
   // client paint; the shuffle below only runs post-hydration, so it never
@@ -57,6 +67,8 @@ export const MatchChallenge = ({ options, pairs, onPair, onUnpair, status, disab
   };
 
   const byId = new Map(options.map((o) => [o.id, parseMatchPair(o.id, o.text)]));
+  const rowIndexById = new Map(options.map((o, index) => [o.id, index]));
+  const colorForId = (id: number) => PAIR_COLORS[rowIndexById.get(id)! % PAIR_COLORS.length];
 
   return (
     <div className="flex gap-x-4">
@@ -73,9 +85,11 @@ export const MatchChallenge = ({ options, pairs, onPair, onUnpair, status, disab
               onClick={() => handleLeftTap(o.id)}
               className={cn(
                 "rounded-lg border-2 px-3 py-2 text-left text-sm lg:text-base",
-                isPaired || isSelected
-                  ? "border-sky-400 bg-sky-100"
-                  : "border-neutral-200 hover:bg-black/5",
+                isPaired
+                  ? colorForId(o.id)
+                  : isSelected
+                    ? "border-dashed border-neutral-400 bg-neutral-100"
+                    : "border-neutral-200 hover:bg-black/5",
               )}
             >
               {byId.get(o.id)?.pt}
@@ -96,9 +110,11 @@ export const MatchChallenge = ({ options, pairs, onPair, onUnpair, status, disab
               onClick={() => handleRightTap(id)}
               className={cn(
                 "rounded-lg border-2 px-3 py-2 text-left text-sm lg:text-base",
-                isPaired || isSelected
-                  ? "border-sky-400 bg-sky-100"
-                  : "border-neutral-200 hover:bg-black/5",
+                isPaired
+                  ? colorForId(id)
+                  : isSelected
+                    ? "border-dashed border-neutral-400 bg-neutral-100"
+                    : "border-neutral-200 hover:bg-black/5",
               )}
             >
               {byId.get(id)?.en}
