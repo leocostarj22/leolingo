@@ -86,6 +86,12 @@ export const Quiz = ({
 
   const [lessonId] = useState(initialLessonId);
   const [hearts, setHearts] = useState(initialHearts);
+  // Frozen on mount like lessonId/hearts above: a review session's server
+  // component re-renders after every answer (revalidatePath) and draws a new
+  // random sample with a different pointsAvailable; the finish screen must
+  // keep reporting the session actually played, not whatever the latest
+  // re-render happened to resample.
+  const [pointsAvailable] = useState(initialPointsAvailable);
 
   const isPracticeSession = initialPercentage === 100;
 
@@ -345,7 +351,7 @@ export const Quiz = ({
           <div className="flex items-center gap-x-4 w-full">
             <ResultCard
               variant="points"
-              value={initialPointsAvailable}
+              value={pointsAvailable}
             />
             <ResultCard
               variant="hearts"
