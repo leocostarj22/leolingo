@@ -7,8 +7,9 @@ import { revalidatePath } from "next/cache";
 import db from "@/db/drizzle";
 import { getUserProgress, getUserSubscription } from "@/db/queries";
 import { challengeProgress, challenges, userProgress } from "@/db/schema";
+import { getNextStreak, getTodayDateString } from "@/lib/streak";
 
-export const upsertChallengeProgress = async (challengeId: number) => {
+export const upsertChallengeProgress = async (challengeId: number, isLastChallenge: boolean) => {
   const { userId } = await auth();
 
   if (!userId) {
@@ -35,6 +36,11 @@ export const upsertChallengeProgress = async (challengeId: number) => {
 
   const lessonId = challenge.lessonId;
   const pointsAwarded = challenge.lesson?.isBonus ? 20 : 10;
+
+  const today = getTodayDateString();
+  const nextStreak = isLastChallenge
+    ? getNextStreak(currentUserProgress.currentStreak, currentUserProgress.lastActivityDate, today)
+    : currentUserProgress.currentStreak;
 
   const existingChallengeProgress = await db.query.challengeProgress.findFirst({
     where: and(
@@ -64,6 +70,7 @@ export const upsertChallengeProgress = async (challengeId: number) => {
     await db.update(userProgress).set({
       hearts: Math.min(currentUserProgress.hearts + 1, 5),
       points: currentUserProgress.points + pointsAwarded,
+      ...(isLastChallenge ? { currentStreak: nextStreak, lastActivityDate: today } : {}),
     }).where(eq(userProgress.userId, userId));
 
     revalidatePath("/learn");
@@ -82,6 +89,7 @@ export const upsertChallengeProgress = async (challengeId: number) => {
 
   await db.update(userProgress).set({
     points: currentUserProgress.points + pointsAwarded,
+    ...(isLastChallenge ? { currentStreak: nextStreak, lastActivityDate: today } : {}),
   }).where(eq(userProgress.userId, userId));
 
   revalidatePath("/learn");
