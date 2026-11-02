@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 
 import { getLesson, getUserProgress, getUserSubscription } from "@/db/queries";
+import { computePointsAvailable } from "@/lib/points";
 
 import { Quiz } from "./quiz";
 import { orderLessonChallenges } from "./order-challenges";
@@ -35,7 +36,7 @@ const LessonPage = async () => {
       initialHearts={userProgress.hearts}
       initialPercentage={initialPercentage}
       initialGender={userProgress.gender}
-      initialIsBonus={lesson.isBonus}
+      initialPointsAvailable={computePointsAvailable(lesson.challenges.map(() => ({ isBonus: lesson.isBonus })))}
       userSubscription={userSubscription}
     />
   );

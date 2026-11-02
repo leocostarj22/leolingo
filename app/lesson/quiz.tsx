@@ -34,7 +34,8 @@ type Props ={
   initialHearts: number;
   initialLessonId: number;
   initialGender: typeof userProgress.$inferSelect["gender"];
-  initialIsBonus: boolean;
+  initialPointsAvailable: number;
+  isReviewSession?: boolean;
   initialLessonChallenges: (typeof challenges.$inferSelect & {
     completed: boolean;
     challengeOptions: typeof challengeOptions.$inferSelect[];
@@ -50,7 +51,8 @@ export const Quiz = ({
   initialHearts,
   initialLessonId,
   initialGender,
-  initialIsBonus,
+  initialPointsAvailable,
+  isReviewSession,
   initialLessonChallenges,
   userSubscription,
 }: Props) => {
@@ -343,7 +345,7 @@ export const Quiz = ({
           <div className="flex items-center gap-x-4 w-full">
             <ResultCard
               variant="points"
-              value={totalChallengeCount * (initialIsBonus ? 20 : 10)}
+              value={initialPointsAvailable}
             />
             <ResultCard
               variant="hearts"
@@ -355,6 +357,7 @@ export const Quiz = ({
           lessonId={lessonId}
           status="completed"
           leveledUp={leveledUp}
+          hidePracticeAgain={isReviewSession}
           onCheck={() => router.push(leveledUp ? "/level-up" : "/learn")}
         />
       </>

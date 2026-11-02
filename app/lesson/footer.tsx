@@ -11,6 +11,7 @@ type Props = {
   lessonId?: number;
   revealedAnswer?: string;
   leveledUp?: boolean;
+  hidePracticeAgain?: boolean;
 };
 
 export const Footer = ({
@@ -20,6 +21,7 @@ export const Footer = ({
   lessonId,
   revealedAnswer,
   leveledUp,
+  hidePracticeAgain,
 }: Props) => {
   useKey("Enter", onCheck, {}, [onCheck]);
   const isMobile = useMedia("(max-width: 1024px)");
@@ -43,7 +45,7 @@ export const Footer = ({
             {revealedAnswer ? `A resposta certa era: "${revealedAnswer}"` : "Try again."}
           </div>
         )}
-        {status === "completed" && (
+        {status === "completed" && !hidePracticeAgain && (
           <Button
             variant="default"
             size={isMobile ? "sm" : "lg"}
