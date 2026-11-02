@@ -1,23 +1,30 @@
 import Link from "next/link";
 import Image from "next/image";
-import { InfinityIcon } from "lucide-react";
+import { Flame, InfinityIcon } from "lucide-react";
 
 import { courses } from "@/db/schema";
 import { Button } from "@/components/ui/button";
+import { getDisplayStreak, getTodayDateString } from "@/lib/streak";
 
 type Props = {
   activeCourse: typeof courses.$inferSelect;
   hearts: number;
   points: number;
   hasActiveSubscription: boolean;
+  currentStreak: number;
+  lastActivityDate: string | null;
 };
 
-export const UserProgress = ({ 
-  activeCourse, 
-  points, 
-  hearts, 
-  hasActiveSubscription
+export const UserProgress = ({
+  activeCourse,
+  points,
+  hearts,
+  hasActiveSubscription,
+  currentStreak,
+  lastActivityDate,
 }: Props) => {
+  const streak = getDisplayStreak(currentStreak, lastActivityDate, getTodayDateString());
+
   return (
     <div className="flex items-center justify-between gap-x-2 w-full">
       <Link href="/courses">
@@ -31,6 +38,10 @@ export const UserProgress = ({
           />
         </Button>
       </Link>
+      <span className="flex items-center text-orange-500 font-bold">
+        <Flame className="h-6 w-6 mr-2 fill-orange-500" />
+        {streak}
+      </span>
       <Link href="/shop">
         <Button variant="ghost" className="text-orange-500">
           <Image src="/points.svg" height={28} width={28} alt="Points" className="mr-2" />

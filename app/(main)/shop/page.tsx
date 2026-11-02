@@ -36,6 +36,8 @@ const ShopPage = async () => {
           hearts={userProgress.hearts}
           points={userProgress.points}
           hasActiveSubscription={isPro}
+          currentStreak={userProgress.currentStreak}
+          lastActivityDate={userProgress.lastActivityDate}
         />
         {!isPro && (
           <Promo />
