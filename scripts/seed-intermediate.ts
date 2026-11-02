@@ -58,6 +58,7 @@ const unitsData: Unit[] = [
           ] },
           { type: "WRITE", question: "Escreve em inglês: \"Nunca tinha comido sushi antes.\"", options: [
             { text: "I had never eaten sushi before", correct: true },
+            { text: "I'd never eaten sushi before", correct: true },
           ] },
           { type: "ARRANGE", question: "Monta a frase: \"Já terminámos o projeto\"", options: [
             { text: "We", correct: true },
@@ -187,6 +188,7 @@ const unitsData: Unit[] = [
           ] },
           { type: "WRITE", question: "Escreve em inglês: \"Vou pensar sobre isso.\"", options: [
             { text: "I will think it over", correct: true },
+            { text: "I'll think about it", correct: true },
           ] },
           { type: "ARRANGE", question: "Monta a frase: \"Ela desistiu do trabalho na semana passada\"", options: [
             { text: "She", correct: true },
@@ -245,6 +247,7 @@ const unitsData: Unit[] = [
           ] },
           { type: "WRITE", question: "Escreve em inglês: \"Vou pensar sobre isso.\"", options: [
             { text: "I will think it over", correct: true },
+            { text: "I'll think about it", correct: true },
           ] },
           { type: "ARRANGE", question: "Monta a frase: \"Já terminámos o projeto\"", options: [
             { text: "We", correct: true },
@@ -300,6 +303,7 @@ const unitsData: Unit[] = [
           ] },
           { type: "WRITE", question: "Escreve em inglês: \"Podemos agendar uma reunião de seguimento?\"", options: [
             { text: "Can we schedule a follow-up meeting?", correct: true },
+            { text: "Can we schedule a follow up meeting?", correct: true },
           ] },
           { type: "ARRANGE", question: "Monta a frase: \"Vamos rever os próximos passos antes de terminar\"", options: [
             { text: "Let's", correct: true },
@@ -388,6 +392,7 @@ const unitsData: Unit[] = [
           ] },
           { type: "WRITE", question: "Escreve em inglês: \"Já implementámos uma solução temporária.\"", options: [
             { text: "We have already implemented a temporary solution", correct: true },
+            { text: "We've already implemented a temporary solution", correct: true },
           ] },
           { type: "ARRANGE", question: "Monta a frase: \"Se identificarmos o problema a tempo, evitamos o atraso\"", options: [
             { text: "If", correct: true },
@@ -435,6 +440,7 @@ const unitsData: Unit[] = [
           ] },
           { type: "WRITE", question: "Escreve em inglês: \"Estou disponível para começar na próxima semana.\"", options: [
             { text: "I'm available to start next week", correct: true },
+            { text: "I am available to start next week", correct: true },
           ] },
           { type: "ARRANGE", question: "Monta a frase: \"Aprendi muito com os meus erros anteriores\"", options: [
             { text: "I", correct: true },

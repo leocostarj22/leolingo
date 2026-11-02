@@ -10,6 +10,7 @@ type Props = {
   disabled?: boolean;
   lessonId?: number;
   revealedAnswer?: string;
+  leveledUp?: boolean;
 };
 
 export const Footer = ({
@@ -18,6 +19,7 @@ export const Footer = ({
   disabled,
   lessonId,
   revealedAnswer,
+  leveledUp,
 }: Props) => {
   useKey("Enter", onCheck, {}, [onCheck]);
   const isMobile = useMedia("(max-width: 1024px)");
@@ -45,7 +47,7 @@ export const Footer = ({
           <Button
             variant="default"
             size={isMobile ? "sm" : "lg"}
-            onClick={() => window.location.href = `/lesson/${lessonId}`}
+            onClick={() => window.location.href = leveledUp ? "/level-up" : `/lesson/${lessonId}`}
           >
             Practice again
           </Button>

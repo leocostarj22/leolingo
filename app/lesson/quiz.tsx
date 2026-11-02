@@ -27,6 +27,7 @@ import { Dialogue } from "./dialogue";
 import { AudioPrompt } from "./audio-prompt";
 import { MatchChallenge } from "./match-challenge";
 import { isMatchCorrect, parseMatchPair } from "@/lib/match";
+import { isArrangeCorrect } from "@/lib/arrange";
 
 type Props ={
   initialPercentage: number;
@@ -183,11 +184,7 @@ export const Quiz = ({
     }
     if (challenge.type === "DIALOGUE") return true;
     if (challenge.type === "ARRANGE") {
-      const correctIds = options.filter((o) => o.correct).map((o) => o.id).sort((a, b) => a - b);
-      return (
-        arrangedTileIds.length === correctIds.length &&
-        arrangedTileIds.every((id, i) => id === correctIds[i])
-      );
+      return isArrangeCorrect(arrangedTileIds, options);
     }
     if (challenge.type === "MATCH") return isMatchCorrect(matchPairs, options.length);
     const correctOption = options.find((option) => option.correct);
@@ -357,6 +354,7 @@ export const Quiz = ({
         <Footer
           lessonId={lessonId}
           status="completed"
+          leveledUp={leveledUp}
           onCheck={() => router.push(leveledUp ? "/level-up" : "/learn")}
         />
       </>
