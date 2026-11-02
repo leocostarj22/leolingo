@@ -25,6 +25,8 @@ import { WriteChallenge } from "./write-challenge";
 import { ArrangeChallenge } from "./arrange-challenge";
 import { Dialogue } from "./dialogue";
 import { AudioPrompt } from "./audio-prompt";
+import { MatchChallenge } from "./match-challenge";
+import { isMatchCorrect, parseMatchPair } from "@/lib/match";
 
 type Props ={
   initialPercentage: number;
@@ -101,6 +103,7 @@ export const Quiz = ({
   const [status, setStatus] = useState<"correct" | "wrong" | "none">("none");
   const [writtenAnswer, setWrittenAnswer] = useState("");
   const [arrangedTileIds, setArrangedTileIds] = useState<number[]>([]);
+  const [matchPairs, setMatchPairs] = useState<Record<number, number>>({});
   const [hasPlayedAudio, setHasPlayedAudio] = useState(false);
   const [revealedAnswer, setRevealedAnswer] = useState<string>();
 
@@ -122,6 +125,7 @@ export const Quiz = ({
     setSelectedOption(undefined);
     setWrittenAnswer("");
     setHasPlayedAudio(false);
+    setMatchPairs({});
 
     const upcomingOptions = upcoming?.challengeOptions ?? [];
     if (upcoming?.type === "ARRANGE" && (wrongAttempts[upcoming.id] ?? 0) >= 1) {
@@ -167,6 +171,7 @@ export const Quiz = ({
     if (challenge?.type === "WRITE") return writtenAnswer.trim().length > 0;
     if (challenge?.type === "ARRANGE") return arrangedTileIds.length > 0;
     if (challenge?.type === "DIALOGUE") return true;
+    if (challenge?.type === "MATCH") return Object.keys(matchPairs).length === options.length;
     return !!selectedOption;
   })();
 
@@ -183,6 +188,7 @@ export const Quiz = ({
         arrangedTileIds.every((id, i) => id === correctIds[i])
       );
     }
+    if (challenge.type === "MATCH") return isMatchCorrect(matchPairs, options.length);
     const correctOption = options.find((option) => option.correct);
     return !!correctOption && correctOption.id === selectedOption;
   };
@@ -195,6 +201,14 @@ export const Quiz = ({
       const byId = new Map(options.map((o) => [o.id, o]));
       const correctIds = options.filter((o) => o.correct).map((o) => o.id).sort((a, b) => a - b);
       return correctIds.map((id) => byId.get(id)?.text).join(" ");
+    }
+    if (challenge.type === "MATCH") {
+      return options
+        .map((o) => {
+          const { pt, en } = parseMatchPair(o.id, o.text);
+          return `${pt} → ${en}`;
+        })
+        .join("; ");
     }
     return options.find((o) => o.correct)?.text ?? "";
   };
@@ -210,6 +224,20 @@ export const Quiz = ({
     setArrangedTileIds((prev) =>
       prev.includes(id) ? prev.filter((tileId) => tileId !== id) : [...prev, id]
     );
+  };
+
+  const onPairMatch = (leftId: number, rightId: number) => {
+    if (status !== "none") return;
+    setMatchPairs((prev) => ({ ...prev, [leftId]: rightId }));
+  };
+
+  const onUnpairMatch = (leftId: number) => {
+    if (status !== "none") return;
+    setMatchPairs((prev) => {
+      const next = { ...prev };
+      delete next[leftId];
+      return next;
+    });
   };
 
   const onContinue = () => {
@@ -380,6 +408,15 @@ export const Quiz = ({
                   options={options}
                   selectedIds={arrangedTileIds}
                   onToggle={onToggleTile}
+                  status={status}
+                  disabled={pending}
+                />
+              ) : challenge.type === "MATCH" ? (
+                <MatchChallenge
+                  options={options}
+                  pairs={matchPairs}
+                  onPair={onPairMatch}
+                  onUnpair={onUnpairMatch}
                   status={status}
                   disabled={pending}
                 />
