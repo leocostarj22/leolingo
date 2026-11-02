@@ -11,7 +11,7 @@ import { reduceHearts } from "@/actions/user-progress";
 import { normalizeAnswer } from "@/lib/utils";
 import { useMascot } from "@/store/use-mascot";
 import { useHeartsModal } from "@/store/use-hearts-modal";
-import { challengeOptions, challenges, userProgress, userSubscription } from "@/db/schema";
+import { challengeOptions, challenges, userProgress } from "@/db/schema";
 import { usePracticeModal } from "@/store/use-practice-modal";
 import { upsertChallengeProgress } from "@/actions/challenge-progress";
 
@@ -35,8 +35,9 @@ type Props ={
     completed: boolean;
     challengeOptions: typeof challengeOptions.$inferSelect[];
   })[];
-  userSubscription: typeof userSubscription.$inferSelect & {
+  userSubscription: {
     isActive: boolean;
+    stripeCustomerId: string | null;
   } | null;
 };
 

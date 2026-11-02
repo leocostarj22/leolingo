@@ -114,6 +114,7 @@ export const userProgress = pgTable("user_progress", {
   gender: genderEnum("gender"),
   englishLevel: englishLevelEnum("english_level"),
   learningGoal: learningGoalEnum("learning_goal"),
+  adminOverridePro: boolean("admin_override_pro").notNull().default(false),
 });
 
 export const userProgressRelations = relations(userProgress, ({ one }) => ({

@@ -243,24 +243,39 @@ export const getLessonPercentage = cache(async () => {
 });
 
 const DAY_IN_MS = 86_400_000;
-export const getUserSubscription = cache(async () => {
+export const getUserSubscription = cache(async (): Promise<{
+  isActive: boolean;
+  stripeCustomerId: string | null;
+} | null> => {
   const { userId } = await auth();
 
   if (!userId) return null;
 
-  const data = await db.query.userSubscription.findFirst({
-    where: eq(userSubscription.userId, userId),
-  });
+  const [subscriptionData, progressData] = await Promise.all([
+    db.query.userSubscription.findFirst({
+      where: eq(userSubscription.userId, userId),
+    }),
+    db.query.userProgress.findFirst({
+      where: eq(userProgress.userId, userId),
+      columns: { adminOverridePro: true },
+    }),
+  ]);
 
-  if (!data) return null;
+  const adminOverridePro = progressData?.adminOverridePro ?? false;
 
-  const isActive = 
-    data.stripePriceId &&
-    data.stripeCurrentPeriodEnd?.getTime()! + DAY_IN_MS > Date.now();
+  if (!subscriptionData) {
+    return adminOverridePro
+      ? { isActive: true, stripeCustomerId: null }
+      : null;
+  }
+
+  const realIsActive =
+    !!subscriptionData.stripePriceId &&
+    subscriptionData.stripeCurrentPeriodEnd.getTime() + DAY_IN_MS > Date.now();
 
   return {
-    ...data,
-    isActive: !!isActive,
+    isActive: realIsActive || adminOverridePro,
+    stripeCustomerId: subscriptionData.stripeCustomerId,
   };
 });
 
