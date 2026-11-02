@@ -48,3 +48,24 @@ test("getDisplayStreak: atividade ontem (gap de 1) → ainda não quebrou", () =
 test("getDisplayStreak: gap de 2+ dias → mostra 0", () => {
   assert.equal(getDisplayStreak(5, "2026-01-01", "2026-01-05"), 0);
 });
+
+test("getNextStreak: lastActivityDate undefined (não só null) não rebenta → trata como sem atividade", () => {
+  assert.equal(getNextStreak(5, undefined as unknown as string | null, "2026-01-05"), 1);
+});
+
+test("getDisplayStreak: lastActivityDate undefined (não só null) não rebenta → mostra 0", () => {
+  assert.equal(getDisplayStreak(5, undefined as unknown as string | null, "2026-01-05"), 0);
+});
+
+test("getTodayDateString: lado de inverno da transição (UTC+0), sem troca de dia", () => {
+  assert.equal(getTodayDateString(new Date("2026-01-15T23:59:00Z")), "2026-01-15");
+});
+
+test("getTodayDateString: fronteira da passagem para hora de verão em Portugal (29/03/2026, 01:00 UTC → 02:00 Lisboa, ainda não houve salto)", () => {
+  assert.equal(getTodayDateString(new Date("2026-03-29T23:00:00Z")), "2026-03-30");
+});
+
+test("getTodayDateString: fronteira do fim da hora de verão em Portugal (25/10/2026)", () => {
+  assert.equal(getTodayDateString(new Date("2026-10-24T23:00:00Z")), "2026-10-25");
+  assert.equal(getTodayDateString(new Date("2026-10-25T23:59:00Z")), "2026-10-25");
+});

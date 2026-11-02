@@ -15,7 +15,7 @@ export const getNextStreak = (
   lastActivityDate: string | null,
   today: string,
 ): number => {
-  if (lastActivityDate === null) return 1;
+  if (lastActivityDate == null) return 1;
 
   const gap = daysSince(lastActivityDate, today);
   if (gap === 0) return currentStreak;
@@ -28,7 +28,7 @@ export const getDisplayStreak = (
   lastActivityDate: string | null,
   today: string,
 ): number => {
-  if (lastActivityDate === null) return 0;
+  if (lastActivityDate == null) return 0;
 
   const gap = daysSince(lastActivityDate, today);
   return gap <= 1 ? currentStreak : 0;
