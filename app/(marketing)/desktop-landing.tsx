@@ -9,15 +9,16 @@ import {
 } from "@clerk/nextjs";
 import { ChevronDown, ChevronLeft, ChevronRight, Globe, Loader } from "lucide-react";
 import Link from "next/link";
+import "flag-icons/css/flag-icons.min.css";
 import { Button } from "@/components/ui/button";
 
 const LANGUAGES = [
-  { flag: "🇬🇧", label: "Inglês" },
-  { flag: "🇪🇸", label: "Espanhol" },
-  { flag: "🇫🇷", label: "Francês" },
-  { flag: "🇩🇪", label: "Alemão" },
-  { flag: "🇮🇹", label: "Italiano" },
-  { flag: "🇵🇹", label: "Português" },
+  { flagCode: "gb", label: "Inglês" },
+  { flagCode: "es", label: "Espanhol" },
+  { flagCode: "fr", label: "Francês" },
+  { flagCode: "de", label: "Alemão" },
+  { flagCode: "it", label: "Italiano" },
+  { flagCode: "pt", label: "Português" },
 ];
 
 export const DesktopLanding = () => {
@@ -125,7 +126,7 @@ export const DesktopLanding = () => {
                     type="button"
                     className="flex items-center gap-x-2 text-sm font-bold text-slate-700 transition-colors hover:text-sky-500"
                   >
-                    <span>{LANGUAGES[0].flag}</span>
+                    <span className={`fi fi-${LANGUAGES[0].flagCode} rounded-sm`} />
                     {LANGUAGES[0].label}
                   </button>
                 </SignUpButton>
@@ -135,15 +136,15 @@ export const DesktopLanding = () => {
                   href="/learn"
                   className="flex items-center gap-x-2 text-sm font-bold text-slate-700 transition-colors hover:text-sky-500"
                 >
-                  <span>{LANGUAGES[0].flag}</span>
+                  <span className={`fi fi-${LANGUAGES[0].flagCode} rounded-sm`} />
                   {LANGUAGES[0].label}
                 </Link>
               </SignedIn>
             </ClerkLoaded>
 
-            {LANGUAGES.slice(1).map(({ flag, label }) => (
+            {LANGUAGES.slice(1).map(({ flagCode, label }) => (
               <span key={label} className="flex items-center gap-x-2 text-sm font-semibold text-slate-400">
-                <span>{flag}</span>
+                <span className={`fi fi-${flagCode} rounded-sm`} />
                 {label}
               </span>
             ))}
