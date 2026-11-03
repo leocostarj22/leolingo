@@ -35,12 +35,12 @@ export const createStripeUrl = async () => {
       {
         quantity: 1,
         price_data: {
-          currency: "USD",
+          currency: "eur",
           product_data: {
             name: "Leolingo Pro",
             description: "Unlimited Hearts",
           },
-          unit_amount: 2000, // $20.00 USD
+          unit_amount: 499, // €4.99
           recurring: {
             interval: "month",
           },
