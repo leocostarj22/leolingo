@@ -39,3 +39,20 @@ test("buildLessonRoadPath: 6 lições produzem 5 segmentos cúbicos ligados", ()
   assert.ok(d.startsWith("M "));
   assert.equal((d.match(/C /g) ?? []).length, 5);
 });
+
+test("getLessonAnchorY: firstRowExtraPx desloca todas as linhas pelo mesmo valor fixo", () => {
+  assert.equal(getLessonAnchorY(0, 36), LESSON_ROW_HEIGHT_PX / 2 + 36);
+  assert.equal(getLessonAnchorY(1, 36) - getLessonAnchorY(0, 36), LESSON_ROW_HEIGHT_PX);
+});
+
+test("getLessonAnchorY: sem firstRowExtraPx mantém o comportamento original", () => {
+  assert.equal(getLessonAnchorY(2), getLessonAnchorY(2, 0));
+});
+
+test("buildLessonRoadPath: firstRowExtraPx desloca o ponto de partida do traçado", () => {
+  const withoutExtra = buildLessonRoadPath(3);
+  const withExtra = buildLessonRoadPath(3, 36);
+  const startYWithout = Number(withoutExtra.match(/^M [\d.-]+,([\d.-]+)/)![1]);
+  const startYWith = Number(withExtra.match(/^M [\d.-]+,([\d.-]+)/)![1]);
+  assert.equal(startYWith - startYWithout, 36);
+});

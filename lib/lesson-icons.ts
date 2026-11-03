@@ -20,5 +20,8 @@ export const LESSON_ICON_MAP: Record<LessonIcon, LucideIcon> = {
 };
 
 export function resolveLessonIcon(name: string): LucideIcon {
-  return LESSON_ICON_MAP[name as LessonIcon] ?? Star;
+  if (Object.hasOwn(LESSON_ICON_MAP, name)) {
+    return LESSON_ICON_MAP[name as LessonIcon];
+  }
+  return Star;
 }

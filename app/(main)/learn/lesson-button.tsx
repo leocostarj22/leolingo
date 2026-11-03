@@ -13,7 +13,6 @@ import "react-circular-progressbar/dist/styles.css";
 type Props = {
   id: number;
   index: number;
-  totalCount: number;
   title: string;
   icon: string;
   locked?: boolean;
@@ -74,7 +73,7 @@ export const LessonButton = ({
         )}
         <div
           className={cn(
-            "flex items-center gap-x-3 rounded-full border-2 border-b-4 bg-white pl-1.5 pr-4 py-1.5 max-w-[260px]",
+            "flex items-center gap-x-3 rounded-full border-2 border-b-4 bg-white pl-1.5 pr-4 py-1.5 max-w-[190px]",
             locked ? "border-neutral-300" : "border-emerald-500",
             current && "ring-4 ring-emerald-200",
           )}
