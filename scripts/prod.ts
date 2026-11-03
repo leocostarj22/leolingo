@@ -56,11 +56,11 @@ const main = async () => {
         const lessons = await db
           .insert(schema.lessons)
           .values([
-            { unitId: unit.id, title: "Nouns", order: 1 },
-            { unitId: unit.id, title: "Verbs", order: 2 },
-            { unitId: unit.id, title: "Adjectives", order: 3 },
-            { unitId: unit.id, title: "Phrases", order: 4 },
-            { unitId: unit.id, title: "Sentences", order: 5 },
+            { unitId: unit.id, title: "Nouns", order: 1, icon: "Tag" },
+            { unitId: unit.id, title: "Verbs", order: 2, icon: "BookOpen" },
+            { unitId: unit.id, title: "Adjectives", order: 3, icon: "BookOpen" },
+            { unitId: unit.id, title: "Phrases", order: 4, icon: "MessageSquare" },
+            { unitId: unit.id, title: "Sentences", order: 5, icon: "MessageSquare" },
           ])
           .returning();
 

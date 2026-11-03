@@ -62,30 +62,35 @@ const main = async () => {
         unitId: 1, // Unit 1 (Learn the basics...)
         order: 1,
         title: "Nouns",
+        icon: "Tag",
       },
       {
         id: 2,
         unitId: 1, // Unit 1 (Learn the basics...)
         order: 2,
         title: "Verbs",
+        icon: "BookOpen",
       },
       {
         id: 3,
         unitId: 1, // Unit 1 (Learn the basics...)
         order: 3,
         title: "Verbs",
+        icon: "BookOpen",
       },
       {
         id: 4,
         unitId: 1, // Unit 1 (Learn the basics...)
         order: 4,
         title: "Verbs",
+        icon: "BookOpen",
       },
       {
         id: 5,
         unitId: 1, // Unit 1 (Learn the basics...)
         order: 5,
         title: "Verbs",
+        icon: "BookOpen",
       },
     ]);
 

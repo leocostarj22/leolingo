@@ -4,6 +4,7 @@ import { drizzle } from "drizzle-orm/node-postgres";
 import { and, eq } from "drizzle-orm";
 
 import * as schema from "../db/schema";
+import type { LessonIcon } from "../lib/lesson-icons";
 
 config({ path: ".env.local" });
 
@@ -13,7 +14,7 @@ const db = drizzle(pool, { schema });
 type Option = { text: string; correct: boolean };
 type ChallengeType = "SELECT" | "ASSIST" | "WRITE" | "ARRANGE" | "DIALOGUE" | "MATCH";
 type Challenge = { type: ChallengeType; question: string; options: Option[] };
-type Lesson = { title: string; isBonus?: boolean; challenges: Challenge[] };
+type Lesson = { title: string; icon: LessonIcon; isBonus?: boolean; challenges: Challenge[] };
 type LearningGoal = "WORK" | null;
 type Unit = {
   title: string;
@@ -30,6 +31,7 @@ const unitsData: Unit[] = [
     lessons: [
       {
         title: "Tempos verbais",
+        icon: "Clock",
         challenges: [
           { type: "SELECT", question: "Como se diz \"Eu já vi esse filme\" em inglês?", options: [
             { text: "I have already seen that movie", correct: true },
@@ -74,6 +76,7 @@ const unitsData: Unit[] = [
       },
       {
         title: "Comparações",
+        icon: "Scale",
         challenges: [
           { type: "SELECT", question: "Como se diz \"Este carro é mais rápido do que aquele\" em inglês?", options: [
             { text: "This car is faster than that one", correct: true },
@@ -120,6 +123,7 @@ const unitsData: Unit[] = [
       },
       {
         title: "Frases condicionais",
+        icon: "GitBranch",
         challenges: [
           { type: "SELECT", question: "Como se diz \"Se chover, ficamos em casa\" em inglês?", options: [
             { text: "If it rains, we will stay home", correct: true },
@@ -160,6 +164,7 @@ const unitsData: Unit[] = [
       },
       {
         title: "Expressões do dia a dia",
+        icon: "MessageSquare",
         challenges: [
           { type: "SELECT", question: "Como se diz \"Desistir\" em inglês (verbo frasal)?", options: [
             { text: "To give up", correct: true },
@@ -210,6 +215,7 @@ const unitsData: Unit[] = [
       },
       {
         title: "Uma conversa sobre planos",
+        icon: "MessageCircle",
         isBonus: true,
         challenges: [
           { type: "DIALOGUE", question: "Leo: Do you have any plans for the weekend?\nJuba: Not yet, why?\nLeo: I was thinking we could visit that new museum.\nJuba: That sounds great, what time?", options: [] },
@@ -219,6 +225,7 @@ const unitsData: Unit[] = [
       },
       {
         title: "Revisão da Unidade",
+        icon: "Trophy",
         challenges: [
           { type: "SELECT", question: "Como se diz \"Eu já vi esse filme\" em inglês?", options: [
             { text: "I have already seen that movie", correct: true },
@@ -275,6 +282,7 @@ const unitsData: Unit[] = [
     lessons: [
       {
         title: "Reuniões e apresentações",
+        icon: "Presentation",
         challenges: [
           { type: "SELECT", question: "Como se diz \"Vamos começar a apresentação\" em inglês?", options: [
             { text: "Let's start the presentation", correct: true },
@@ -321,6 +329,7 @@ const unitsData: Unit[] = [
       },
       {
         title: "Relatórios e dados",
+        icon: "BarChart3",
         challenges: [
           { type: "SELECT", question: "Como se diz \"As vendas aumentaram 10%\" em inglês?", options: [
             { text: "Sales increased by 10%", correct: true },
@@ -369,6 +378,7 @@ const unitsData: Unit[] = [
       },
       {
         title: "Resolver problemas",
+        icon: "Puzzle",
         challenges: [
           { type: "SELECT", question: "Como se diz \"Encontrámos um problema\" em inglês?", options: [
             { text: "We ran into a problem", correct: true },
@@ -412,6 +422,7 @@ const unitsData: Unit[] = [
       },
       {
         title: "Entrevistas e feedback",
+        icon: "UserCheck",
         challenges: [
           { type: "SELECT", question: "Como se diz \"Fala-me sobre a tua experiência anterior\" em inglês?", options: [
             { text: "Tell me about your previous experience", correct: true },
@@ -463,6 +474,7 @@ const unitsData: Unit[] = [
       },
       {
         title: "Uma reunião de equipa",
+        icon: "MessageCircle",
         isBonus: true,
         challenges: [
           { type: "DIALOGUE", question: "Leo: We ran into a problem with the deadline.\nJuba: What's the root cause?\nLeo: The supplier was late again.\nJuba: Let's find a backup plan.", options: [] },
@@ -472,6 +484,7 @@ const unitsData: Unit[] = [
       },
       {
         title: "Revisão da Unidade",
+        icon: "Trophy",
         challenges: [
           { type: "SELECT", question: "Como se diz \"Vamos começar a apresentação\" em inglês?", options: [
             { text: "Let's start the presentation", correct: true },
@@ -565,6 +578,7 @@ const main = async () => {
           const [lessonRow] = await tx.insert(schema.lessons).values({
             unitId: unitRow.id,
             title: lesson.title,
+            icon: lesson.icon,
             order: lessonOrder++,
             isBonus: lesson.isBonus ?? false,
           }).returning();

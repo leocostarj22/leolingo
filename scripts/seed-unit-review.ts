@@ -179,6 +179,7 @@ const insertUnitReview = async (tx: Database, content: UnitReviewContent) => {
   const [lessonRow] = await tx.insert(schema.lessons).values({
     unitId: unitRow.id,
     title: "Revisão da Unidade",
+    icon: "Trophy",
     order: 6,
     isBonus: false,
   }).returning();

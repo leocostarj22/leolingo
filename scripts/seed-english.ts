@@ -3,6 +3,7 @@ import { Pool } from "pg";
 import { drizzle } from "drizzle-orm/node-postgres";
 
 import * as schema from "../db/schema";
+import type { LessonIcon } from "../lib/lesson-icons";
 
 config({ path: ".env.local" });
 
@@ -12,7 +13,7 @@ const db = drizzle(pool, { schema });
 type Option = { text: string; correct: boolean; imageSrc?: string };
 type ChallengeType = "SELECT" | "ASSIST";
 type Challenge = { type: ChallengeType; question: string; options: Option[] };
-type Lesson = { title: string; challenges: Challenge[] };
+type Lesson = { title: string; icon: LessonIcon; challenges: Challenge[] };
 type EnglishLevel = "BEGINNER" | "BASIC" | "INTERMEDIATE" | "ADVANCED";
 type LearningGoal = "TRAVEL" | "WORK" | "STUDY_ABROAD" | "SPEAK_CONFIDENTLY" | "OTHER";
 type Unit = {
@@ -32,6 +33,7 @@ const unitsData: Unit[] = [
     lessons: [
       {
         title: "Cumprimentos",
+        icon: "Handshake",
         challenges: [
           { type: "SELECT", question: "Como se diz \"Olá\" em inglês?", options: [
             { text: "Hello", correct: true },
@@ -67,6 +69,7 @@ const unitsData: Unit[] = [
       },
       {
         title: "Pessoas",
+        icon: "Users",
         challenges: [
           { type: "SELECT", question: "Qual destas é \"o homem\"?", options: [
             { text: "the man", correct: true, imageSrc: "/man.svg" },
@@ -97,6 +100,7 @@ const unitsData: Unit[] = [
       },
       {
         title: "Números",
+        icon: "Hash",
         challenges: [
           { type: "ASSIST", question: "\"um\"", options: [
             { text: "one", correct: true },
@@ -132,6 +136,7 @@ const unitsData: Unit[] = [
       },
       {
         title: "Be e Have",
+        icon: "BookOpen",
         challenges: [
           { type: "ASSIST", question: "\"Eu sou\"", options: [
             { text: "I am", correct: true },
@@ -175,6 +180,7 @@ const unitsData: Unit[] = [
     lessons: [
       {
         title: "No escritório",
+        icon: "Briefcase",
         challenges: [
           { type: "ASSIST", question: "\"a secretária\" (móvel)", options: [
             { text: "the desk", correct: true },
@@ -210,6 +216,7 @@ const unitsData: Unit[] = [
       },
       {
         title: "Reuniões",
+        icon: "Users",
         challenges: [
           { type: "ASSIST", question: "\"Podemos começar?\"", options: [
             { text: "Can we start?", correct: true },
@@ -245,6 +252,7 @@ const unitsData: Unit[] = [
       },
       {
         title: "Email",
+        icon: "Mail",
         challenges: [
           { type: "ASSIST", question: "\"Caro/Cara\" (início de email)", options: [
             { text: "Dear", correct: true },
@@ -280,6 +288,7 @@ const unitsData: Unit[] = [
       },
       {
         title: "Conversas de trabalho",
+        icon: "MessageSquare",
         challenges: [
           { type: "ASSIST", question: "\"Como foi o teu fim de semana?\"", options: [
             { text: "How was your weekend?", correct: true },
@@ -323,6 +332,7 @@ const unitsData: Unit[] = [
     lessons: [
       {
         title: "No aeroporto",
+        icon: "Plane",
         challenges: [
           { type: "ASSIST", question: "\"o passaporte\"", options: [
             { text: "the passport", correct: true },
@@ -358,6 +368,7 @@ const unitsData: Unit[] = [
       },
       {
         title: "No hotel",
+        icon: "Hotel",
         challenges: [
           { type: "ASSIST", question: "\"Tenho uma reserva.\"", options: [
             { text: "I have a reservation.", correct: true },
@@ -393,6 +404,7 @@ const unitsData: Unit[] = [
       },
       {
         title: "Pedir direções",
+        icon: "MapPin",
         challenges: [
           { type: "ASSIST", question: "\"Onde fica a estação?\"", options: [
             { text: "Where is the station?", correct: true },
@@ -428,6 +440,7 @@ const unitsData: Unit[] = [
       },
       {
         title: "No restaurante",
+        icon: "UtensilsCrossed",
         challenges: [
           { type: "ASSIST", question: "\"Posso ver o menu?\"", options: [
             { text: "Can I see the menu?", correct: true },
@@ -490,6 +503,7 @@ const main = async () => {
         const [lessonRow] = await db.insert(schema.lessons).values({
           unitId: unitRow.id,
           title: lesson.title,
+          icon: lesson.icon,
           order: lessonOrder++,
         }).returning();
 

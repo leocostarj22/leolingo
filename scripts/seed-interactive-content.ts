@@ -316,6 +316,7 @@ const insertBonusLesson = async (tx: Database, content: BonusLessonContent) => {
   const [lessonRow] = await tx.insert(schema.lessons).values({
     unitId: unitRow.id,
     title: content.title,
+    icon: "MessageCircle",
     order: 5,
     isBonus: true,
   }).returning();
