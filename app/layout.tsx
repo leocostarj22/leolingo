@@ -14,6 +14,9 @@ const font = Nunito({ subsets: ["latin"] });
 export const metadata: Metadata = {
   title: "Leolingo",
   description: "Learn, practice, and master new languages with Leolingo",
+  other: {
+    "google-adsense-account": "ca-pub-4456402604074753",
+  },
 };
 
 export default function RootLayout({
