@@ -1,5 +1,7 @@
 export const POINTS_TO_REFILL = 10;
 
+export const DAILY_LESSON_LIMIT = 5;
+
 export const quests = [
   {
     title: "Earn 20 XP",
