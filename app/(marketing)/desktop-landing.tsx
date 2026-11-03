@@ -114,15 +114,6 @@ export const DesktopLanding = () => {
       </section>
 
       <section className="flex w-full flex-col bg-gradient-to-b from-lime-100 to-green-50">
-        <div className="relative w-full" style={{ aspectRatio: "1648 / 70" }}>
-          <Image
-            src="/home/10_fundo_paisagem.png"
-            alt=""
-            fill
-            className="pointer-events-none object-cover object-top"
-          />
-        </div>
-
         <div className="flex items-center justify-center gap-x-6 px-10 py-8">
           <ChevronLeft className="h-5 w-5 shrink-0 text-slate-400" />
 
