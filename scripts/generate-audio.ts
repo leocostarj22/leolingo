@@ -16,7 +16,7 @@ export const generateAudio = async (items: { slug: string; text: string }[]) => 
       fs.mkdirSync(path.dirname(filePath), { recursive: true });
     }
 
-    if (fs.existsSync(filePath)) {
+    if (fs.existsSync(filePath) && fs.statSync(filePath).size > 0) {
       console.log(`Skipping ${item.slug} (already exists)`);
       continue;
     }
