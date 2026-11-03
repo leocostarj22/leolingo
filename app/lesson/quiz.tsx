@@ -4,7 +4,7 @@ import { toast } from "sonner";
 import Image from "next/image";
 import Confetti from "react-confetti";
 import { useRouter } from "next/navigation";
-import { useEffect, useMemo, useState, useTransition } from "react";
+import { useEffect, useMemo, useRef, useState, useTransition } from "react";
 import { useAudio, useWindowSize, useMount } from "react-use";
 
 import { reduceHearts } from "@/actions/user-progress";
@@ -59,7 +59,7 @@ export const Quiz = ({
   initialLessonChallenges,
   userSubscription,
 }: Props) => {
-  const { open: openHeartsModal } = useHeartsModal();
+  const { open: openHeartsModal, heartsRefillCount } = useHeartsModal();
   const { open: openPracticeModal } = usePracticeModal();
 
   useMount(() => {
@@ -89,6 +89,19 @@ export const Quiz = ({
 
   const [lessonId] = useState(initialLessonId);
   const [hearts, setHearts] = useState(initialHearts);
+  // HeartsModal bumps `heartsRefillCount` in the shared store after a
+  // successful ad refill (DB hearts -> 5) so this already-mounted Quiz can
+  // sync its local `hearts` state, which a server revalidation alone cannot
+  // update. The ref skips the effect's first run (mount, count === 0),
+  // since that initial value must never trigger a refill.
+  const hasMountedRefillEffect = useRef(false);
+  useEffect(() => {
+    if (!hasMountedRefillEffect.current) {
+      hasMountedRefillEffect.current = true;
+      return;
+    }
+    setHearts(5);
+  }, [heartsRefillCount]);
   // Frozen on mount like lessonId/hearts above: a review session's server
   // component re-renders after every answer (revalidatePath) and draws a new
   // random sample with a different pointsAvailable; the finish screen must

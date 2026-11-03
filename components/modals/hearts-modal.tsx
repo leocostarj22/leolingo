@@ -24,7 +24,7 @@ export const HeartsModal = () => {
   const [isClient, setIsClient] = useState(false);
   const [watchingAd, setWatchingAd] = useState(false);
   const [, startTransition] = useTransition();
-  const { isOpen, close } = useHeartsModal();
+  const { isOpen, close, signalHeartsRefilled } = useHeartsModal();
   const gender = useMascot((state) => state.gender);
 
   useEffect(() => setIsClient(true), []);
@@ -44,6 +44,7 @@ export const HeartsModal = () => {
       refillHeartsWithAd()
         .then(() => {
           onClose();
+          signalHeartsRefilled();
         })
         .catch(() => {
           toast.error("Could not refill your hearts. Please try again.");
