@@ -7,9 +7,18 @@ import {
   SignedIn,
   SignedOut,
 } from "@clerk/nextjs";
-import { Loader } from "lucide-react";
+import { ChevronDown, ChevronLeft, ChevronRight, Globe, Loader } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+
+const LANGUAGES = [
+  { flag: "🇬🇧", label: "Inglês" },
+  { flag: "🇪🇸", label: "Espanhol" },
+  { flag: "🇫🇷", label: "Francês" },
+  { flag: "🇩🇪", label: "Alemão" },
+  { flag: "🇮🇹", label: "Italiano" },
+  { flag: "🇵🇹", label: "Português" },
+];
 
 export const DesktopLanding = () => {
   return (
@@ -17,40 +26,35 @@ export const DesktopLanding = () => {
       <nav className="flex w-full items-center justify-between border-b px-10 py-4">
         <Image src="/home/01_logomarca.png" alt="Leolingo" width={148} height={38} priority />
 
-        <div className="relative h-[38px] w-[78px] overflow-hidden">
-          <Image
-            src="/home/02_menu_navegacao.png"
-            alt="Início"
-            width={575}
-            height={75}
-            className="absolute left-0 top-1/2 h-auto w-[290px] max-w-none -translate-y-1/2"
-          />
-        </div>
+        <span className="rounded-full bg-orange-100 px-4 py-2 text-sm font-bold text-orange-500">
+          Início
+        </span>
 
-        <ClerkLoaded>
-          <SignedOut>
-            <div className="relative h-[40px] w-[215px]">
-              <Image
-                src="/home/03_seletor_idioma_entrar.png"
-                alt=""
-                width={430}
-                height={79}
-                className="pointer-events-none h-auto w-[215px]"
-              />
+        <div className="flex items-center gap-x-6">
+          <div className="flex items-center gap-x-1 text-sm font-semibold text-slate-600">
+            <Globe className="h-4 w-4" />
+            Português (PT)
+            <ChevronDown className="h-4 w-4" />
+          </div>
+
+          <ClerkLoaded>
+            <SignedOut>
               <SignInButton mode="modal" afterSignInUrl="/learn" afterSignUpUrl="/learn">
                 <button
-                  aria-label="Entrar"
-                  className="absolute right-0 top-0 h-full w-[90px] cursor-pointer"
-                />
+                  type="button"
+                  className="rounded-full border-2 border-sky-500 px-5 py-1.5 text-sm font-bold text-sky-500 transition-colors hover:bg-sky-50"
+                >
+                  Entrar
+                </button>
               </SignInButton>
-            </div>
-          </SignedOut>
-          <SignedIn>
-            <Button size="sm" variant="primaryOutline" asChild>
-              <Link href="/learn">Continuar</Link>
-            </Button>
-          </SignedIn>
-        </ClerkLoaded>
+            </SignedOut>
+            <SignedIn>
+              <Button size="sm" variant="primaryOutline" asChild>
+                <Link href="/learn">Continuar</Link>
+              </Button>
+            </SignedIn>
+          </ClerkLoaded>
+        </div>
       </nav>
 
       <section className="flex flex-1 items-center justify-center bg-gradient-to-b from-sky-100 to-white px-10 py-12">
@@ -66,21 +70,14 @@ export const DesktopLanding = () => {
           </div>
 
           <div className="flex flex-col items-start gap-y-6">
-            <Image
-              src="/home/05_titulo_principal.png"
-              alt="Aprende idiomas de forma divertida, fácil e eficaz!"
-              width={665}
-              height={200}
-              className="h-auto w-[420px]"
-              priority
-            />
-            <Image
-              src="/home/06_texto_apresentacao.png"
-              alt="Com o Leo e a Juba, transforma o estudo num jogo e alcança os teus objetivos, passo a passo."
-              width={625}
-              height={95}
-              className="h-auto w-[400px]"
-            />
+            <h1 className="max-w-[420px] text-4xl font-extrabold leading-tight text-slate-800">
+              Aprende idiomas de forma{" "}
+              <span className="bg-yellow-300 px-1">divertida</span>, fácil e eficaz!
+            </h1>
+            <p className="max-w-[400px] text-lg text-slate-500">
+              Com o Leo e a Juba, transforma o estudo num jogo e alcança os teus objetivos, passo a
+              passo.
+            </p>
 
             <ClerkLoading>
               <Loader className="h-6 w-6 animate-spin text-muted-foreground" />
@@ -89,25 +86,19 @@ export const DesktopLanding = () => {
               <SignedOut>
                 <div className="flex flex-col items-start gap-y-3">
                   <SignUpButton mode="modal" afterSignInUrl="/learn" afterSignUpUrl="/learn">
-                    <button aria-label="Comece agora" className="cursor-pointer">
-                      <Image
-                        src="/home/07_botao_comece_agora.png"
-                        alt="Comece agora"
-                        width={515}
-                        height={92}
-                        className="h-auto w-[260px]"
-                      />
+                    <button
+                      type="button"
+                      className="rounded-full border-b-4 border-green-600 bg-green-500 px-10 py-3 text-base font-bold uppercase tracking-wide text-white transition-colors hover:bg-green-500/90 active:border-b-0"
+                    >
+                      Comece agora
                     </button>
                   </SignUpButton>
                   <SignInButton mode="modal" afterSignInUrl="/learn" afterSignUpUrl="/learn">
-                    <button aria-label="Já tenho uma conta" className="cursor-pointer">
-                      <Image
-                        src="/home/08_botao_ja_tenho_conta.png"
-                        alt="Já tenho uma conta"
-                        width={515}
-                        height={102}
-                        className="h-auto w-[260px]"
-                      />
+                    <button
+                      type="button"
+                      className="rounded-full border-2 border-sky-500 px-10 py-3 text-base font-bold uppercase tracking-wide text-sky-500 transition-colors hover:bg-sky-50"
+                    >
+                      Já tenho uma conta
                     </button>
                   </SignInButton>
                 </div>
@@ -122,38 +113,52 @@ export const DesktopLanding = () => {
         </div>
       </section>
 
-      <section className="relative flex w-full items-center justify-center py-8">
-        <Image
-          src="/home/10_fundo_paisagem.png"
-          alt=""
-          fill
-          className="pointer-events-none -z-10 object-cover"
-        />
-        <div className="relative h-[70px] w-[850px]">
+      <section className="flex w-full flex-col bg-gradient-to-b from-lime-100 to-green-50">
+        <div className="relative w-full" style={{ aspectRatio: "1648 / 70" }}>
           <Image
-            src="/home/09_barra_idiomas.png"
-            alt="Idiomas disponíveis: Inglês, Espanhol, Francês, Alemão, Italiano, Português"
-            width={1325}
-            height={108}
-            className="h-auto w-[850px]"
+            src="/home/10_fundo_paisagem.png"
+            alt=""
+            fill
+            className="pointer-events-none object-cover object-top"
           />
-          <ClerkLoaded>
-            <SignedOut>
-              <SignUpButton mode="modal" afterSignInUrl="/learn" afterSignUpUrl="/learn">
-                <button
-                  aria-label="Começar a aprender Inglês"
-                  className="absolute left-[55px] top-0 h-full w-[135px] cursor-pointer"
-                />
-              </SignUpButton>
-            </SignedOut>
-            <SignedIn>
-              <Link
-                href="/learn"
-                aria-label="Continuar a aprender Inglês"
-                className="absolute left-[55px] top-0 h-full w-[135px]"
-              />
-            </SignedIn>
-          </ClerkLoaded>
+        </div>
+
+        <div className="flex items-center justify-center gap-x-6 px-10 py-8">
+          <ChevronLeft className="h-5 w-5 shrink-0 text-slate-400" />
+
+          <div className="flex items-center gap-x-6 rounded-full bg-white px-8 py-3 shadow-sm">
+            <ClerkLoaded>
+              <SignedOut>
+                <SignUpButton mode="modal" afterSignInUrl="/learn" afterSignUpUrl="/learn">
+                  <button
+                    type="button"
+                    className="flex items-center gap-x-2 text-sm font-bold text-slate-700 transition-colors hover:text-sky-500"
+                  >
+                    <span>{LANGUAGES[0].flag}</span>
+                    {LANGUAGES[0].label}
+                  </button>
+                </SignUpButton>
+              </SignedOut>
+              <SignedIn>
+                <Link
+                  href="/learn"
+                  className="flex items-center gap-x-2 text-sm font-bold text-slate-700 transition-colors hover:text-sky-500"
+                >
+                  <span>{LANGUAGES[0].flag}</span>
+                  {LANGUAGES[0].label}
+                </Link>
+              </SignedIn>
+            </ClerkLoaded>
+
+            {LANGUAGES.slice(1).map(({ flag, label }) => (
+              <span key={label} className="flex items-center gap-x-2 text-sm font-semibold text-slate-400">
+                <span>{flag}</span>
+                {label}
+              </span>
+            ))}
+          </div>
+
+          <ChevronRight className="h-5 w-5 shrink-0 text-slate-400" />
         </div>
       </section>
     </div>
