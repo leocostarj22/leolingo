@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 
-import { getLesson, getUserProgress, getUserSubscription } from "@/db/queries";
+import { getLesson, getUserProgress, getUserSubscription, isLastLessonInUnit } from "@/db/queries";
 import { computePointsAvailable } from "@/lib/points";
 import { getTodayDateString } from "@/lib/streak";
 import { hasPilhaRemaining } from "@/lib/pilha";
@@ -29,6 +29,8 @@ const LessonPage = async () => {
     redirect("/learn");
   }
 
+  const isLastLesson = await isLastLessonInUnit(lesson.id);
+
   const initialPercentage = lesson.challenges
     .filter((challenge) => challenge.completed)
     .length / lesson.challenges.length * 100;
@@ -52,6 +54,7 @@ const LessonPage = async () => {
       initialGender={userProgress.gender}
       initialPointsAvailable={computePointsAvailable(lesson.challenges.map(() => ({ isBonus: lesson.isBonus })))}
       userSubscription={userSubscription}
+      isLastLessonInUnit={isLastLesson}
     />
   );
 };

@@ -51,6 +51,7 @@ const ReviewPage = async () => {
       initialPointsAvailable={reviewQueue.pointsAvailable}
       isReviewSession
       userSubscription={userSubscription}
+      isLastLessonInUnit={false}
     />
   );
 };

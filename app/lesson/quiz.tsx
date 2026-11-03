@@ -14,6 +14,7 @@ import { useHeartsModal } from "@/store/use-hearts-modal";
 import { challengeOptions, challenges, userProgress } from "@/db/schema";
 import { usePracticeModal } from "@/store/use-practice-modal";
 import { upsertChallengeProgress } from "@/actions/challenge-progress";
+import { AdSlot } from "@/components/ad-slot";
 
 import { Header } from "./header";
 import { DialogueHeader } from "./dialogue-header";
@@ -36,6 +37,7 @@ type Props ={
   initialGender: typeof userProgress.$inferSelect["gender"];
   initialPointsAvailable: number;
   isReviewSession?: boolean;
+  isLastLessonInUnit: boolean;
   initialLessonChallenges: (typeof challenges.$inferSelect & {
     completed: boolean;
     challengeOptions: typeof challengeOptions.$inferSelect[];
@@ -53,6 +55,7 @@ export const Quiz = ({
   initialGender,
   initialPointsAvailable,
   isReviewSession,
+  isLastLessonInUnit,
   initialLessonChallenges,
   userSubscription,
 }: Props) => {
@@ -107,6 +110,7 @@ export const Quiz = ({
   );
   const [wrongAttempts, setWrongAttempts] = useState<Record<number, number>>({});
   const [leveledUp, setLeveledUp] = useState(false);
+  const [showingInterstitial, setShowingInterstitial] = useState(false);
   const totalChallengeCount = initialLessonChallenges.length;
 
   const [selectedOption, setSelectedOption] = useState<number>();
@@ -320,6 +324,23 @@ export const Quiz = ({
   };
 
   if (!challenge) {
+    const shouldShowInterstitial = isLastLessonInUnit
+      && !isPracticeSession
+      && !isReviewSession
+      && !userSubscription?.isActive;
+
+    if (showingInterstitial) {
+      return (
+        <div className="flex flex-col gap-y-4 lg:gap-y-8 max-w-lg mx-auto text-center items-center justify-center h-full">
+          <AdSlot
+            title="Boa! Acabaste a unidade."
+            description="Vê este anúncio antes de continuares."
+            onComplete={() => router.push(leveledUp ? "/level-up" : "/learn")}
+          />
+        </div>
+      );
+    }
+
     return (
       <>
         {finishAudio}
@@ -364,7 +385,13 @@ export const Quiz = ({
           status="completed"
           leveledUp={leveledUp}
           hidePracticeAgain={isReviewSession}
-          onCheck={() => router.push(leveledUp ? "/level-up" : "/learn")}
+          onCheck={() => {
+            if (shouldShowInterstitial) {
+              setShowingInterstitial(true);
+              return;
+            }
+            router.push(leveledUp ? "/level-up" : "/learn");
+          }}
         />
       </>
     );

@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 
-import { getLesson, getUserProgress, getUserSubscription } from "@/db/queries";
+import { getLesson, getUserProgress, getUserSubscription, isLastLessonInUnit } from "@/db/queries";
 import { computePointsAvailable } from "@/lib/points";
 import { getTodayDateString } from "@/lib/streak";
 import { hasPilhaRemaining } from "@/lib/pilha";
@@ -22,15 +22,18 @@ const LessonIdPage = async ({
   const lessonData = getLesson(params.lessonId);
   const userProgressData = getUserProgress();
   const userSubscriptionData = getUserSubscription();
+  const isLastLessonInUnitData = isLastLessonInUnit(params.lessonId);
 
   const [
     lesson,
     userProgress,
     userSubscription,
+    isLastLesson,
   ] = await Promise.all([
     lessonData,
     userProgressData,
     userSubscriptionData,
+    isLastLessonInUnitData,
   ]);
 
   if (!lesson || !userProgress) {
@@ -60,6 +63,7 @@ const LessonIdPage = async ({
       initialGender={userProgress.gender}
       initialPointsAvailable={computePointsAvailable(lesson.challenges.map(() => ({ isBonus: lesson.isBonus })))}
       userSubscription={userSubscription}
+      isLastLessonInUnit={isLastLesson}
     />
   );
 };

@@ -328,6 +328,27 @@ export const getUserSubscription = cache(async (): Promise<{
   };
 });
 
+export const isLastLessonInUnit = cache(async (lessonId: number): Promise<boolean> => {
+  const lesson = await db.query.lessons.findFirst({
+    where: eq(lessons.id, lessonId),
+    with: {
+      unit: {
+        with: {
+          lessons: true,
+        },
+      },
+    },
+  });
+
+  if (!lesson) {
+    return false;
+  }
+
+  const maxOrder = Math.max(...lesson.unit.lessons.map((unitLesson) => unitLesson.order));
+
+  return lesson.order === maxOrder;
+});
+
 export const getTopTenUsers = cache(async () => {
   const { userId } = await auth();
 
