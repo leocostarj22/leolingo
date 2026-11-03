@@ -20,6 +20,13 @@ export const englishLevelEnum = pgEnum("english_level", ["BEGINNER", "BASIC", "I
 
 export const learningGoalEnum = pgEnum("learning_goal", ["TRAVEL", "WORK", "STUDY_ABROAD", "SPEAK_CONFIDENTLY", "OTHER"]);
 
+export const lessonIconEnum = pgEnum("lesson_icon", [
+  "Handshake", "Users", "Hash", "BookOpen", "MessageCircle", "Trophy",
+  "Briefcase", "Mail", "MessageSquare", "Plane", "Hotel", "MapPin",
+  "UtensilsCrossed", "Clock", "Scale", "GitBranch", "Presentation",
+  "BarChart3", "Puzzle", "UserCheck", "Tag", "Star",
+]);
+
 export const units = pgTable("units", {
   id: serial("id").primaryKey(),
   title: text("title").notNull(), // Unit 1
@@ -44,6 +51,7 @@ export const lessons = pgTable("lessons", {
   unitId: integer("unit_id").references(() => units.id, { onDelete: "cascade" }).notNull(),
   order: integer("order").notNull(),
   isBonus: boolean("is_bonus").notNull().default(false),
+  icon: lessonIconEnum("icon").notNull().default("Star"),
 });
 
 export const lessonsRelations = relations(lessons, ({ one, many }) => ({
