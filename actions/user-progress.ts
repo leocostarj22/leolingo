@@ -254,3 +254,26 @@ export const refillHearts = async () => {
   revalidatePath("/quests");
   revalidatePath("/leaderboard");
 };
+
+export const refillHeartsWithAd = async (): Promise<void> => {
+  const { userId } = await auth();
+
+  if (!userId) {
+    throw new Error("Unauthorized");
+  }
+
+  const existingUserProgress = await getUserProgress();
+
+  if (!existingUserProgress) {
+    throw new Error("Profile not found");
+  }
+
+  await db.update(userProgress).set({
+    hearts: 5,
+  }).where(eq(userProgress.userId, userId));
+
+  revalidatePath("/shop");
+  revalidatePath("/learn");
+  revalidatePath("/quests");
+  revalidatePath("/leaderboard");
+};

@@ -2,7 +2,8 @@
 
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useTransition } from "react";
+import { toast } from "sonner";
 
 import {
   Dialog,
@@ -13,12 +14,16 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import { AdSlot } from "@/components/ad-slot";
+import { refillHeartsWithAd } from "@/actions/user-progress";
 import { useHeartsModal } from "@/store/use-hearts-modal";
 import { useMascot } from "@/store/use-mascot";
 
 export const HeartsModal = () => {
   const router = useRouter();
   const [isClient, setIsClient] = useState(false);
+  const [watchingAd, setWatchingAd] = useState(false);
+  const [, startTransition] = useTransition();
   const { isOpen, close } = useHeartsModal();
   const gender = useMascot((state) => state.gender);
 
@@ -26,7 +31,24 @@ export const HeartsModal = () => {
 
   const onClick = () => {
     close();
-    router.push("/store");
+    router.push("/shop");
+  };
+
+  const onClose = () => {
+    setWatchingAd(false);
+    close();
+  };
+
+  const onAdComplete = () => {
+    startTransition(() => {
+      refillHeartsWithAd()
+        .then(() => {
+          onClose();
+        })
+        .catch(() => {
+          toast.error("Could not refill your hearts. Please try again.");
+        });
+    });
   };
 
   if (!isClient) {
@@ -34,7 +56,7 @@ export const HeartsModal = () => {
   }
 
   return (
-    <Dialog open={isOpen} onOpenChange={close}>
+    <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-md">
         <DialogHeader>
           <div className="flex items-center w-full justify-center mb-5">
@@ -53,24 +75,40 @@ export const HeartsModal = () => {
           </DialogDescription>
         </DialogHeader>
         <DialogFooter className="mb-4">
-          <div className="flex flex-col gap-y-4 w-full">
-            <Button 
-              variant="primary" 
-              className="w-full" 
-              size="lg" 
-              onClick={onClick}
-            >
-              Get unlimited hearts
-            </Button>
-            <Button
-              variant="primaryOutline" 
-              className="w-full" 
-              size="lg" 
-              onClick={close}
-            >
-              No thanks
-            </Button>
-          </div>
+          {watchingAd ? (
+            <AdSlot
+              title="Watch a short ad"
+              description="Your hearts will be refilled when the ad finishes."
+              onComplete={onAdComplete}
+            />
+          ) : (
+            <div className="flex flex-col gap-y-4 w-full">
+              <Button
+                variant="primary"
+                className="w-full"
+                size="lg"
+                onClick={onClick}
+              >
+                Get unlimited hearts
+              </Button>
+              <Button
+                variant="secondaryOutline"
+                className="w-full"
+                size="lg"
+                onClick={() => setWatchingAd(true)}
+              >
+                Ver anúncio
+              </Button>
+              <Button
+                variant="primaryOutline"
+                className="w-full"
+                size="lg"
+                onClick={onClose}
+              >
+                No thanks
+              </Button>
+            </div>
+          )}
         </DialogFooter>
       </DialogContent>
     </Dialog>
