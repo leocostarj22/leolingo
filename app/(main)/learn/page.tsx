@@ -67,7 +67,13 @@ const LearnPage = async () => {
       <FeedWrapper>
         <Header title={userProgress.activeCourse.title} />
         {units.map((unit) => (
-          <div key={unit.id} className="mb-10">
+          <div
+            key={unit.id}
+            className="relative overflow-hidden rounded-3xl bg-gradient-to-b from-sky-100 to-emerald-50 p-4 mb-10"
+          >
+            <span className="absolute left-4 top-4 text-xl opacity-50" aria-hidden>🍃</span>
+            <span className="absolute right-6 top-10 text-xl opacity-50" aria-hidden>🐾</span>
+            <span className="absolute right-10 bottom-6 text-lg opacity-50" aria-hidden>🐾</span>
             <Unit
               id={unit.id}
               order={unit.order}
