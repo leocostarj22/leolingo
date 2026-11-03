@@ -8,6 +8,7 @@ import db from "@/db/drizzle";
 import { getUserProgress, getUserSubscription, getUnits } from "@/db/queries";
 import { challengeProgress, challenges, userProgress } from "@/db/schema";
 import { getNextStreak, getTodayDateString } from "@/lib/streak";
+import { getNextDailyLessonsCompleted } from "@/lib/pilha";
 import { getNextLevel, isLevelComplete, type EnglishLevel } from "@/lib/level-up";
 
 export const upsertChallengeProgress = async (challengeId: number, isLastChallenge: boolean) => {
@@ -106,9 +107,13 @@ export const upsertChallengeProgress = async (challengeId: number, isLastChallen
 
   const levelUpResult = await computeLevelUpResult();
 
+  const nextDailyLessonsCompleted = isLastChallenge
+    ? getNextDailyLessonsCompleted(currentUserProgress.dailyLessonsCompleted, currentUserProgress.dailyLessonsDate, today)
+    : currentUserProgress.dailyLessonsCompleted;
+
   await db.update(userProgress).set({
     points: currentUserProgress.points + pointsAwarded,
-    ...(isLastChallenge ? { currentStreak: nextStreak, lastActivityDate: today } : {}),
+    ...(isLastChallenge ? { currentStreak: nextStreak, lastActivityDate: today, dailyLessonsCompleted: nextDailyLessonsCompleted, dailyLessonsDate: today } : {}),
     ...(levelUpResult ? { englishLevel: levelUpResult.newLevel } : {}),
   }).where(eq(userProgress.userId, userId));
 

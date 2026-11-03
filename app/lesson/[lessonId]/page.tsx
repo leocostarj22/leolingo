@@ -2,8 +2,12 @@ import { redirect } from "next/navigation";
 
 import { getLesson, getUserProgress, getUserSubscription } from "@/db/queries";
 import { computePointsAvailable } from "@/lib/points";
+import { getTodayDateString } from "@/lib/streak";
+import { hasPilhaRemaining } from "@/lib/pilha";
+import { DAILY_LESSON_LIMIT } from "@/constants";
 
 import { Quiz } from "../quiz";
+import { NoPilhaScreen } from "../no-pilha-screen";
 import { orderLessonChallenges } from "../order-challenges";
 
 type Props = {
@@ -36,6 +40,16 @@ const LessonIdPage = async ({
   const initialPercentage = lesson.challenges
     .filter((challenge) => challenge.completed)
     .length / lesson.challenges.length * 100;
+
+  const today = getTodayDateString();
+  const isNewLesson = initialPercentage < 100;
+  const pilhaBlocked = isNewLesson
+    && !userSubscription?.isActive
+    && !hasPilhaRemaining(userProgress.dailyLessonsCompleted, userProgress.dailyLessonsDate, today, DAILY_LESSON_LIMIT);
+
+  if (pilhaBlocked) {
+    return <NoPilhaScreen />;
+  }
 
   return (
     <Quiz

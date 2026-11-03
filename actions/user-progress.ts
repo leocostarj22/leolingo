@@ -9,6 +9,7 @@ import db from "@/db/drizzle";
 import { POINTS_TO_REFILL } from "@/constants";
 import { getCourseById, getUserProgress, getUserSubscription } from "@/db/queries";
 import { challengeProgress, challenges, userProgress } from "@/db/schema";
+import { getTodayDateString } from "@/lib/streak";
 
 export const upsertUserProgress = async (courseId: number) => {
   const { userId } = await auth();
@@ -204,6 +205,28 @@ export const reduceHearts = async (challengeId: number) => {
   revalidatePath("/quests");
   revalidatePath("/leaderboard");
   revalidatePath(`/lesson/${lessonId}`);
+};
+
+export const refillPilha = async (): Promise<void> => {
+  const { userId } = await auth();
+
+  if (!userId) {
+    throw new Error("Unauthorized");
+  }
+
+  const existingUserProgress = await getUserProgress();
+
+  if (!existingUserProgress) {
+    throw new Error("Profile not found");
+  }
+
+  await db.update(userProgress).set({
+    dailyLessonsCompleted: 0,
+    dailyLessonsDate: getTodayDateString(),
+  }).where(eq(userProgress.userId, userId));
+
+  revalidatePath("/lesson");
+  revalidatePath("/lesson/[lessonId]", "page");
 };
 
 export const refillHearts = async () => {
