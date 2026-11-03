@@ -10,10 +10,13 @@ import {
   SignedOut,
 } from "@clerk/nextjs";
 import { Button } from "@/components/ui/button";
+import { DesktopLanding } from "./desktop-landing";
 
 export default function Home() {
   return (
-    <div className="relative flex min-h-screen w-full flex-col overflow-hidden">
+    <>
+      <DesktopLanding />
+      <div className="relative flex min-h-screen w-full flex-col overflow-hidden lg:hidden">
       <Image
         src="/hero-leolingo.png"
         alt="Leo, a mascote do Leolingo, em frente ao Big Ben em Londres"
@@ -76,6 +79,7 @@ export default function Home() {
           </ClerkLoaded>
         </div>
       </div>
-    </div>
+      </div>
+    </>
   );
 }
