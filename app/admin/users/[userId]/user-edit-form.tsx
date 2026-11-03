@@ -5,6 +5,8 @@ import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { ENGLISH_LEVEL_OPTIONS, LEARNING_GOAL_OPTIONS } from "@/lib/profile-options";
+import type { EnglishLevel, LearningGoal } from "@/lib/profile-options";
 import {
   resetCourseProgress,
   resetLessonProgress,
@@ -14,32 +16,10 @@ import {
 } from "@/actions/admin";
 
 type Gender = "MALE" | "FEMALE";
-type EnglishLevel = "BEGINNER" | "BASIC" | "INTERMEDIATE" | "ADVANCED";
-type LearningGoal =
-  | "TRAVEL"
-  | "WORK"
-  | "STUDY_ABROAD"
-  | "SPEAK_CONFIDENTLY"
-  | "OTHER";
 
 const GENDER_OPTIONS: { value: Gender; label: string }[] = [
   { value: "MALE", label: "Masculino" },
   { value: "FEMALE", label: "Feminino" },
-];
-
-const ENGLISH_LEVEL_OPTIONS: { value: EnglishLevel; label: string }[] = [
-  { value: "BEGINNER", label: "Iniciante" },
-  { value: "BASIC", label: "Básico" },
-  { value: "INTERMEDIATE", label: "Intermédio" },
-  { value: "ADVANCED", label: "Avançado" },
-];
-
-const LEARNING_GOAL_OPTIONS: { value: LearningGoal; label: string }[] = [
-  { value: "TRAVEL", label: "Viajar pelo mundo" },
-  { value: "WORK", label: "Melhorar no trabalho" },
-  { value: "STUDY_ABROAD", label: "Estudar no estrangeiro" },
-  { value: "SPEAK_CONFIDENTLY", label: "Falar com confiança" },
-  { value: "OTHER", label: "Outros objetivos" },
 ];
 
 type Lesson = {

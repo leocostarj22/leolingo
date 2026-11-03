@@ -6,18 +6,13 @@ import type { FormEvent } from "react";
 import { toast } from "sonner";
 
 import { cn } from "@/lib/utils";
+import { ENGLISH_LEVEL_OPTIONS, LEARNING_GOAL_OPTIONS } from "@/lib/profile-options";
+import type { EnglishLevel, LearningGoal } from "@/lib/profile-options";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { completeUserProfile } from "@/actions/user-progress";
 
 type Gender = "MALE" | "FEMALE";
-type EnglishLevel = "BEGINNER" | "BASIC" | "INTERMEDIATE" | "ADVANCED";
-type LearningGoal =
-  | "TRAVEL"
-  | "WORK"
-  | "STUDY_ABROAD"
-  | "SPEAK_CONFIDENTLY"
-  | "OTHER";
 
 // Mirrors the parameter shape of `completeUserProfile` so the payload we
 // build here can never drift from what the server action actually expects.
@@ -31,21 +26,6 @@ type ProfileFormProps = {
 const GENDER_OPTIONS: { value: Gender; label: string; icon: string; theme: "sky" | "pink" }[] = [
   { value: "MALE", label: "Masculino", icon: "♂", theme: "sky" },
   { value: "FEMALE", label: "Feminino", icon: "♀", theme: "pink" },
-];
-
-const ENGLISH_LEVEL_OPTIONS: { value: EnglishLevel; label: string }[] = [
-  { value: "BEGINNER", label: "Iniciante" },
-  { value: "BASIC", label: "Básico" },
-  { value: "INTERMEDIATE", label: "Intermédio" },
-  { value: "ADVANCED", label: "Avançado" },
-];
-
-const LEARNING_GOAL_OPTIONS: { value: LearningGoal; label: string }[] = [
-  { value: "TRAVEL", label: "Viajar pelo mundo" },
-  { value: "WORK", label: "Melhorar no trabalho" },
-  { value: "STUDY_ABROAD", label: "Estudar no estrangeiro" },
-  { value: "SPEAK_CONFIDENTLY", label: "Falar com confiança" },
-  { value: "OTHER", label: "Outros objetivos" },
 ];
 
 const toggleButtonClasses = (isActive: boolean, activeTheme: "sky" | "pink") =>

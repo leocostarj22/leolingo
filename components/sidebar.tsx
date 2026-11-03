@@ -8,7 +8,7 @@ import {
   useClerk,
   useUser,
 } from "@clerk/nextjs";
-import { ChevronRight, Loader, Settings } from "lucide-react";
+import { ChevronRight, GraduationCap, Loader, Settings } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
@@ -79,6 +79,15 @@ export const Sidebar = ({ className }: Props) => {
             <span className="flex-1 font-bold text-slate-500">Definições</span>
             <ChevronRight className="h-5 w-5 shrink-0 text-slate-400" />
           </button>
+          <div className="h-px bg-slate-200" />
+          <Link
+            href="/preferences"
+            className="flex w-full items-center gap-x-3 py-3 text-left"
+          >
+            <GraduationCap className="h-5 w-5 shrink-0 text-slate-400" />
+            <span className="flex-1 font-bold text-slate-500">Objetivo e nível</span>
+            <ChevronRight className="h-5 w-5 shrink-0 text-slate-400" />
+          </Link>
         </ClerkLoaded>
       </div>
     </div>

@@ -120,6 +120,36 @@ export const completeUserProfile = async (data: CompleteUserProfileInput): Promi
   redirect("/courses");
 };
 
+type UpdateLearningPreferencesInput = {
+  englishLevel: "BEGINNER" | "BASIC" | "INTERMEDIATE" | "ADVANCED" | null;
+  learningGoal: "TRAVEL" | "WORK" | "STUDY_ABROAD" | "SPEAK_CONFIDENTLY" | "OTHER" | null;
+};
+
+export const updateLearningPreferences = async (
+  data: UpdateLearningPreferencesInput,
+): Promise<void> => {
+  const { userId } = await auth();
+
+  if (!userId) {
+    throw new Error("Unauthorized");
+  }
+
+  const existingUserProgress = await getUserProgress();
+
+  if (!existingUserProgress) {
+    throw new Error("Profile not found");
+  }
+
+  await db.update(userProgress).set({
+    englishLevel: data.englishLevel,
+    learningGoal: data.learningGoal,
+  }).where(eq(userProgress.userId, userId));
+
+  revalidatePath("/learn");
+  revalidatePath("/courses");
+  revalidatePath("/preferences");
+};
+
 export const reduceHearts = async (challengeId: number) => {
   const { userId } = await auth();
 
