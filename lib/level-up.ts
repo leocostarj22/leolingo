@@ -1,9 +1,11 @@
 export type EnglishLevel = "BEGINNER" | "BASIC" | "INTERMEDIATE" | "ADVANCED";
 
-// Progressão automática ainda só cobre BASIC -> INTERMEDIATE; qualquer outro
-// nível (incluindo INTERMEDIATE) não tem sucessor nesta fase.
+// Progressão automática: BEGINNER -> BASIC -> INTERMEDIATE. ADVANCED não tem
+// sucessor (é o último nível).
 export const getNextLevel = (level: EnglishLevel): EnglishLevel | null => {
-  return level === "BASIC" ? "INTERMEDIATE" : null;
+  if (level === "BEGINNER") return "BASIC";
+  if (level === "BASIC") return "INTERMEDIATE";
+  return null;
 };
 
 export const isLevelComplete = (lessons: { completed: boolean }[]): boolean => {

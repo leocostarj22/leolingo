@@ -10,8 +10,8 @@ test("getNextLevel: INTERMEDIATE não tem próximo nível nesta fase", () => {
   assert.equal(getNextLevel("INTERMEDIATE"), null);
 });
 
-test("getNextLevel: BEGINNER não tem próximo nível nesta fase", () => {
-  assert.equal(getNextLevel("BEGINNER"), null);
+test("getNextLevel: BEGINNER avança para BASIC", () => {
+  assert.equal(getNextLevel("BEGINNER"), "BASIC");
 });
 
 test("getNextLevel: ADVANCED não tem próximo nível", () => {
