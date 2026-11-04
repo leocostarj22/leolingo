@@ -25,16 +25,16 @@ export async function POST(req: Request) {
     });
   }
 
-  const session = event.data.object as Stripe.Checkout.Session;
-
   if (event.type === "checkout.session.completed") {
-    const subscription = await stripe.subscriptions.retrieve(
-      session.subscription as string
-    );
+    const session = event.data.object as Stripe.Checkout.Session;
 
     if (!session?.metadata?.userId) {
       return new NextResponse("User ID is required", { status: 400 });
     }
+
+    const subscription = await stripe.subscriptions.retrieve(
+      session.subscription as string
+    );
 
     await db.insert(userSubscription).values({
       userId: session.metadata.userId,
@@ -48,9 +48,22 @@ export async function POST(req: Request) {
   }
 
   if (event.type === "invoice.payment_succeeded") {
-    const subscription = await stripe.subscriptions.retrieve(
-      session.subscription as string
-    );
+    const invoice = event.data.object as Stripe.Invoice;
+
+    // Invoice.subscription moved to invoice.parent.subscription_details.subscription
+    // in newer Stripe API versions; this reads whichever shape is present.
+    const subscriptionId =
+      typeof invoice.subscription === "string"
+        ? invoice.subscription
+        : (invoice as unknown as {
+            parent?: { subscription_details?: { subscription?: string | null } };
+          }).parent?.subscription_details?.subscription;
+
+    if (!subscriptionId) {
+      return new NextResponse("Subscription ID is required", { status: 400 });
+    }
+
+    const subscription = await stripe.subscriptions.retrieve(subscriptionId);
 
     await db.update(userSubscription).set({
       stripePriceId: subscription.items.data[0].price.id,
