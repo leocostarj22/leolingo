@@ -153,9 +153,13 @@ export const getReviewQueue = cache(async () => {
 });
 
 export const getCourses = cache(async () => {
-  const data = await db.query.courses.findMany();
+  const data = await db.query.courses.findMany({
+    with: { units: { limit: 1 } },
+  });
 
-  return data;
+  return data
+    .filter((course) => course.units.length > 0)
+    .map(({ units, ...course }) => course);
 });
 
 export const getCourseById = cache(async (courseId: number) => {
