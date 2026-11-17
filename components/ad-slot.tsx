@@ -37,7 +37,7 @@ export const AdSlot = ({
     <div className="flex flex-col items-center gap-y-5 w-full">
       <div className="flex flex-col items-center justify-center gap-y-2 w-full h-40 rounded-xl bg-slate-100 border-2 border-slate-200">
         <span className="font-bold text-slate-400 uppercase tracking-wide text-sm">
-          Ad
+          Anúncio
         </span>
         <span className="font-bold text-slate-400 text-3xl">
           {isReady ? "✓" : secondsLeft}

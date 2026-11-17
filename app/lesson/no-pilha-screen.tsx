@@ -8,11 +8,12 @@ import { useState, useTransition } from "react";
 import { Button } from "@/components/ui/button";
 import { AdSlot } from "@/components/ad-slot";
 import { refillPilha } from "@/actions/user-progress";
+import { DAILY_LESSON_LIMIT } from "@/constants";
 
 export const NoPilhaScreen = () => {
   const router = useRouter();
   const [showAd, setShowAd] = useState(false);
-  const [pending, startTransition] = useTransition();
+  const [, startTransition] = useTransition();
 
   const onAdComplete = () => {
     startTransition(() => {
@@ -20,7 +21,7 @@ export const NoPilhaScreen = () => {
         .then(() => {
           router.refresh();
         })
-        .catch(() => toast.error("Something went wrong. Please try again."));
+        .catch(() => toast.error("Algo correu mal. Tenta novamente."));
     });
   };
 
@@ -29,7 +30,7 @@ export const NoPilhaScreen = () => {
       <div className="flex flex-col gap-y-4 lg:gap-y-8 max-w-lg mx-auto text-center items-center justify-center h-full">
         <AdSlot
           title="Quase lá!"
-          description="Vê este anúncio para ganhares mais 5 lições hoje."
+          description={`Vê este anúncio para ganhares mais ${DAILY_LESSON_LIMIT} lições hoje.`}
           onComplete={onAdComplete}
         />
       </div>
@@ -42,20 +43,22 @@ export const NoPilhaScreen = () => {
         Sem Pilha por hoje
       </h1>
       <p className="text-muted-foreground">
-        Já completaste as 5 lições novas de hoje. Vê um anúncio para
-        ganhares mais lições, ou volta cá amanhã.
+        Já completaste as {DAILY_LESSON_LIMIT} lições novas de hoje. Vê um
+        anúncio para ganhares mais lições, ou volta cá amanhã.
       </p>
       <Button
         variant="primary"
         size="lg"
         className="w-full"
-        disabled={pending}
         onClick={() => setShowAd(true)}
       >
         Ver anúncio
       </Button>
       <Link href="/shop" className="text-sm font-bold text-primary underline">
         Ir à loja
+      </Link>
+      <Link href="/learn" className="text-sm font-bold text-muted-foreground underline">
+        Voltar
       </Link>
     </div>
   );

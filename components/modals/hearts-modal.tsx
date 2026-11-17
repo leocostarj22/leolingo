@@ -47,7 +47,7 @@ export const HeartsModal = () => {
           signalHeartsRefilled();
         })
         .catch(() => {
-          toast.error("Could not refill your hearts. Please try again.");
+          toast.error("Não foi possível recarregar os corações. Tenta novamente.");
         });
     });
   };
@@ -69,17 +69,17 @@ export const HeartsModal = () => {
             />
           </div>
           <DialogTitle className="text-center font-bold text-2xl">
-            You ran out of hearts!
+            Ficaste sem corações!
           </DialogTitle>
           <DialogDescription className="text-center text-base">
-            Get Pro for unlimited hearts, or purchase them in the store.
+            Torna-te Pro para corações ilimitados, ou compra-os na loja.
           </DialogDescription>
         </DialogHeader>
         <DialogFooter className="mb-4">
           {watchingAd ? (
             <AdSlot
-              title="Watch a short ad"
-              description="Your hearts will be refilled when the ad finishes."
+              title="Vê um anúncio curto"
+              description="Os teus corações são recarregados quando o anúncio terminar."
               onComplete={onAdComplete}
             />
           ) : (
@@ -90,7 +90,7 @@ export const HeartsModal = () => {
                 size="lg"
                 onClick={onClick}
               >
-                Get unlimited hearts
+                Corações ilimitados
               </Button>
               <Button
                 variant="secondaryOutline"
@@ -106,7 +106,7 @@ export const HeartsModal = () => {
                 size="lg"
                 onClick={onClose}
               >
-                No thanks
+                Agora não
               </Button>
             </div>
           )}
