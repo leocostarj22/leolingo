@@ -2,7 +2,9 @@ import { redirect } from "next/navigation";
 
 import { Sidebar } from "@/components/sidebar";
 import { MobileHeader } from "@/components/mobile-header";
+import { WhatsNewModal } from "@/components/modals/whats-new-modal";
 import { getUserProgress } from "@/db/queries";
+import { getLatestAnnouncement } from "@/lib/whats-new";
 
 type Props = {
   children: React.ReactNode;
@@ -17,6 +19,8 @@ const MainLayout = async ({
     redirect("/profile-setup");
   }
 
+  const latestAnnouncement = getLatestAnnouncement();
+
   return (
     <>
       <MobileHeader />
@@ -26,6 +30,12 @@ const MainLayout = async ({
           {children}
         </div>
       </main>
+      {latestAnnouncement && (
+        <WhatsNewModal
+          announcement={latestAnnouncement}
+          alreadySeen={userProgress.lastSeenAnnouncementId === latestAnnouncement.id}
+        />
+      )}
     </>
   );
 };

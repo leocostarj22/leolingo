@@ -127,6 +127,7 @@ export const userProgress = pgTable("user_progress", {
   lastActivityDate: text("last_activity_date"),
   dailyLessonsCompleted: integer("daily_lessons_completed").notNull().default(0),
   dailyLessonsDate: text("daily_lessons_date"),
+  lastSeenAnnouncementId: text("last_seen_announcement_id"),
 });
 
 export const userProgressRelations = relations(userProgress, ({ one }) => ({
