@@ -72,6 +72,18 @@ const PrivacyPage = () => {
         </section>
 
         <section>
+          <h2 className="text-xl font-bold text-slate-800">
+            Exercícios de áudio
+          </h2>
+          <p className="mt-2">
+            Nos exercícios em que respondes por voz, a tua gravação é
+            enviada à Groq (um serviço de terceiros) apenas para ser
+            transcrita em texto. Não guardamos essa gravação em lado
+            nenhum — é descartada imediatamente depois de ser transcrita.
+          </p>
+        </section>
+
+        <section>
           <h2 className="text-xl font-bold text-slate-800">Os teus direitos</h2>
           <p className="mt-2">
             Podes pedir, a qualquer momento, para veres, corrigires ou
