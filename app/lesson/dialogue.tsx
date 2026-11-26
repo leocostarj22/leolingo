@@ -1,5 +1,7 @@
 import Image from "next/image";
 
+import { parseDialogueScript } from "@/lib/dialogue";
+
 type Props = {
   script: string;
 };
@@ -24,15 +26,11 @@ const SPEAKER_STYLES: Record<string, SpeakerStyle> = {
 };
 
 export const Dialogue = ({ script }: Props) => {
-  const lines = script.split("\n").filter(Boolean);
+  const lines = parseDialogueScript(script);
 
   return (
     <div className="flex flex-col gap-y-3">
-      {lines.map((line, i) => {
-        const [rawSpeaker, ...rest] = line.split(":");
-        const hasColon = rest.length > 0;
-        const speaker = hasColon ? rawSpeaker.trim() : "";
-        const text = hasColon ? rest.join(":").trim() : line.trim();
+      {lines.map(({ speaker, text }, i) => {
         const style = SPEAKER_STYLES[speaker];
         const side = style?.side ?? (i % 2 === 1 ? "right" : "left");
         const isRight = side === "right";
