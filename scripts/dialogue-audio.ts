@@ -1,3 +1,4 @@
+import crypto from "crypto";
 import fs from "fs";
 import os from "os";
 import path from "path";
@@ -7,12 +8,17 @@ import { synthesizeToFile } from "./generate-audio";
 
 const AUDIO_DIR = path.join(process.cwd(), "public", "audio");
 
+const dialogueSlug = (script: string, voices: Record<string, string>) => {
+  const hash = crypto.createHash("sha1").update(script + JSON.stringify(voices)).digest("hex").slice(0, 12);
+  return `dialogue-${hash}`;
+};
+
 export const generateDialogueAudio = async (params: {
-  slug: string;
   script: string;
   voices: Record<string, string>;
 }): Promise<string> => {
-  const { slug, script, voices } = params;
+  const { script, voices } = params;
+  const slug = dialogueSlug(script, voices);
   const publicPath = `/audio/${slug}.mp3`;
   const filePath = path.join(AUDIO_DIR, `${slug}.mp3`);
 

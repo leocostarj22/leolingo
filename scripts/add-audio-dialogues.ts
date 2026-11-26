@@ -59,7 +59,6 @@ async function main() {
     }
 
     const audioSrc = await generateDialogueAudio({
-      slug: `dialogue-new-${lesson.id}`,
       script: dialogueChallenge.question,
       voices: VOICES,
     });

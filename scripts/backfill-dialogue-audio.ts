@@ -22,7 +22,6 @@ async function main() {
 
   for (const row of rows) {
     const audioSrc = await generateDialogueAudio({
-      slug: `dialogue-${row.id}`,
       script: row.question,
       voices: VOICES,
     });
