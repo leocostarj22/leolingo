@@ -457,6 +457,7 @@ export const Quiz = ({
                 />
               ) : challenge.type === "SPEAK" ? (
                 <SpeakChallenge
+                  key={challenge.id}
                   value={writtenAnswer}
                   onChange={setWrittenAnswer}
                   status={status}
