@@ -50,6 +50,10 @@ export const draftDialogues: DraftEntry[] = [
           {
             "text": "No change, the total is five dollars.",
             "correct": true
+          },
+          {
+            "text": "No change. The total is $5.",
+            "correct": true
           }
         ]
       }
@@ -148,17 +152,17 @@ export const draftDialogues: DraftEntry[] = [
         "question": "Em inglês, escreve a frase final do Leo sobre viajar sozinho.",
         "options": [
           {
-            "text": "It convinced me that solitude can amplify the sensory details, making every moment feel more profound.",
+            "text": "Absolutely, it convinced me that solitude can amplify the sensory details, making every moment feel more profound.",
             "correct": true
           }
         ]
       },
       {
         "type": "SPEAK",
-        "question": "Em inglês, pergunta à Juba como ela se sentiria ao assistir aquele nascer do sol.",
+        "question": "Em inglês, diz a pergunta que a Juba fez sobre a experiência de viajar sozinho.",
         "options": [
           {
-            "text": "How would you feel watching that sunrise?",
+            "text": "Did the experience change your perspective on traveling alone?",
             "correct": true
           }
         ]
