@@ -24,6 +24,14 @@ export const WHATS_NEW: Announcement[] = [
       "Procura a opção \"Instalar\" ou \"Adicionar ao ecrã principal\" no teu browser",
     ],
   },
+  {
+    id: "2026-11-26-exercicios-audio",
+    title: "Novos exercícios de áudio",
+    items: [
+      "Os diálogos entre o Leo e a Juba agora têm áudio real, com voz masculina e feminina",
+      "Alguns exercícios já aceitam resposta falada — grava a tua voz e é transcrita automaticamente",
+    ],
+  },
 ];
 
 export const getLatestAnnouncement = (): Announcement | undefined =>
