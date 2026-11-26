@@ -111,9 +111,10 @@ conversa com Leonardo.)
 
 ## Decisões já tomadas (como decidido na conversa)
 
-- Leo e Juba ganham vozes `node-edge-tts` distintas (o implementador
-  escolhe duas vozes Neural gratuitas claramente diferentes, ex: uma
-  masculina, uma feminina).
+- Leo e Juba ganham vozes `node-edge-tts` distintas: **Leo é masculino,
+  Juba é feminina** — o implementador escolhe duas vozes Neural
+  gratuitas em inglês que respeitem estes géneros (ex: uma voz
+  `en-US-...` masculina para o Leo, uma feminina para a Juba).
 - A transcrição do diálogo continua visível em bolhas de chat durante a
   reprodução (sem modo "escuta cega"/texto escondido) — reaproveita o
   componente `Dialogue` tal como está, só acrescenta um controlo de
