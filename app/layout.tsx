@@ -21,10 +21,6 @@ export const metadata: Metadata = {
     statusBarStyle: "default",
     title: "Leolingo",
   },
-  icons: {
-    icon: "/icon-192.png",
-    apple: "/icon-192.png",
-  },
   other: {
     "google-adsense-account": "ca-pub-4456402604074753",
   },
