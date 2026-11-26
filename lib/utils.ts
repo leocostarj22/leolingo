@@ -20,6 +20,16 @@ export function absoluteUrl(path: string) {
   return `${process.env.NEXT_PUBLIC_APP_URL}${path}`;
 };
 
+export const isWrittenAnswerCorrect = (
+  written: string,
+  options: { text: string; correct: boolean }[],
+) => {
+  return options
+    .filter((o) => o.correct)
+    .map((o) => normalizeAnswer(o.text))
+    .includes(normalizeAnswer(written));
+};
+
 export const slugifyWord = (text: string) => {
   return text
     .toLowerCase()

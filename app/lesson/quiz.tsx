@@ -8,7 +8,7 @@ import { useEffect, useMemo, useRef, useState, useTransition } from "react";
 import { useAudio, useWindowSize, useMount } from "react-use";
 
 import { reduceHearts } from "@/actions/user-progress";
-import { normalizeAnswer } from "@/lib/utils";
+import { isWrittenAnswerCorrect, normalizeAnswer } from "@/lib/utils";
 import { useMascot } from "@/store/use-mascot";
 import { useHeartsModal } from "@/store/use-hearts-modal";
 import { challengeOptions, challenges, userProgress } from "@/db/schema";
@@ -23,6 +23,7 @@ import { Challenge } from "./challenge";
 import { ResultCard } from "./result-card";
 import { QuestionBubble } from "./question-bubble";
 import { WriteChallenge } from "./write-challenge";
+import { SpeakChallenge } from "./speak-challenge";
 import { ArrangeChallenge } from "./arrange-challenge";
 import { Dialogue } from "./dialogue";
 import { AudioPrompt } from "./audio-prompt";
@@ -195,7 +196,7 @@ export const Quiz = ({
 
   const isAnswerReady = (() => {
     if (challenge?.audioSrc && !hasPlayedAudio) return false;
-    if (challenge?.type === "WRITE") return writtenAnswer.trim().length > 0;
+    if (challenge?.type === "WRITE" || challenge?.type === "SPEAK") return writtenAnswer.trim().length > 0;
     if (challenge?.type === "ARRANGE") return arrangedTileIds.length > 0;
     if (challenge?.type === "DIALOGUE") return true;
     if (challenge?.type === "MATCH") return Object.keys(matchPairs).length === options.length;
@@ -203,9 +204,8 @@ export const Quiz = ({
   })();
 
   const isAnswerCorrect = () => {
-    if (challenge.type === "WRITE") {
-      const accepted = options.filter((o) => o.correct).map((o) => normalizeAnswer(o.text));
-      return accepted.includes(normalizeAnswer(writtenAnswer));
+    if (challenge.type === "WRITE" || challenge.type === "SPEAK") {
+      return isWrittenAnswerCorrect(writtenAnswer, options);
     }
     if (challenge.type === "DIALOGUE") return true;
     if (challenge.type === "ARRANGE") {
@@ -217,7 +217,7 @@ export const Quiz = ({
   };
 
   const getCorrectAnswerText = () => {
-    if (challenge.type === "WRITE") {
+    if (challenge.type === "WRITE" || challenge.type === "SPEAK") {
       return options.filter((o) => o.correct)[0]?.text ?? "";
     }
     if (challenge.type === "ARRANGE") {
@@ -454,6 +454,13 @@ export const Quiz = ({
                   status={status}
                   disabled={pending}
                   hint={writeHint}
+                />
+              ) : challenge.type === "SPEAK" ? (
+                <SpeakChallenge
+                  value={writtenAnswer}
+                  onChange={setWrittenAnswer}
+                  status={status}
+                  disabled={pending}
                 />
               ) : challenge.type === "ARRANGE" ? (
                 <ArrangeChallenge

@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { normalizeAnswer, slugifyWord } from "./utils";
+import { normalizeAnswer, slugifyWord, isWrittenAnswerCorrect } from "./utils";
 
 test("normalizeAnswer: ignora maiúsculas/minúsculas e espaços extra", () => {
   assert.equal(normalizeAnswer("  Hello   World  "), "hello world");
@@ -33,4 +33,18 @@ test("slugifyWord: contrações e apóstrofos", () => {
 
 test("slugifyWord: mesma palavra em textos diferentes gera o mesmo slug", () => {
   assert.equal(slugifyWord("The"), slugifyWord("the"));
+});
+
+test("isWrittenAnswerCorrect aceita qualquer opção marcada correct, ignorando maiúsculas/pontuação", () => {
+  const options = [
+    { text: "Good morning.", correct: true },
+    { text: "Good night", correct: false },
+  ];
+  assert.equal(isWrittenAnswerCorrect("good morning", options), true);
+  assert.equal(isWrittenAnswerCorrect("GOOD MORNING!", options), true);
+  assert.equal(isWrittenAnswerCorrect("good night", options), false);
+});
+
+test("isWrittenAnswerCorrect com texto vazio é sempre false", () => {
+  assert.equal(isWrittenAnswerCorrect("", [{ text: "Hi", correct: true }]), false);
 });
