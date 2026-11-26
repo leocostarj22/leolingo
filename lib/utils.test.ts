@@ -48,3 +48,24 @@ test("isWrittenAnswerCorrect aceita qualquer opção marcada correct, ignorando 
 test("isWrittenAnswerCorrect com texto vazio é sempre false", () => {
   assert.equal(isWrittenAnswerCorrect("", [{ text: "Hi", correct: true }]), false);
 });
+
+test("isWrittenAnswerCorrect aceita texto transcrito com pontuação diferente da esperada (resposta falada)", () => {
+  const options = [{ text: "No change, the total is five dollars.", correct: true }];
+  assert.equal(isWrittenAnswerCorrect("No change. The total is five dollars.", options), true);
+});
+
+test("isWrittenAnswerCorrect aceita qualquer uma de várias opções corretas", () => {
+  const options = [
+    { text: "No change, the total is five dollars.", correct: true },
+    { text: "No change. The total is $5.", correct: true },
+    { text: "That's wrong", correct: false },
+  ];
+  assert.equal(isWrittenAnswerCorrect("no change the total is $5", options), true);
+});
+
+test("normalizeAnswer: remove pontuação interna, não só a final", () => {
+  assert.equal(
+    normalizeAnswer("No change. The total is five dollars."),
+    normalizeAnswer("No change, the total is five dollars."),
+  );
+});

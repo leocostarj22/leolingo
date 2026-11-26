@@ -10,10 +10,9 @@ export const normalizeAnswer = (value: string) => {
     .trim()
     .toLowerCase()
     .replace(/[‘’`´]/g, "'")
-    .replace(/,/g, "")
+    .replace(/[,.!?;:]/g, "")
     .replace(/\s+/g, " ")
-    .trim()
-    .replace(/[.!?]+$/g, "");
+    .trim();
 };
 
 export function absoluteUrl(path: string) {
