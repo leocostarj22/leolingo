@@ -1,6 +1,6 @@
 type OrderableChallenge = {
   completed: boolean;
-  type: "SELECT" | "ASSIST" | "WRITE" | "ARRANGE" | "DIALOGUE" | "MATCH";
+  type: "SELECT" | "ASSIST" | "WRITE" | "ARRANGE" | "DIALOGUE" | "MATCH" | "SPEAK";
   audioSrc: string | null;
 };
 
