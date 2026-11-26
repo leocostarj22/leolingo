@@ -16,6 +16,14 @@ export const WHATS_NEW: Announcement[] = [
       "Novos exercícios de correspondência de palavras em várias lições",
     ],
   },
+  {
+    id: "2026-11-26-pwa-instalavel",
+    title: "Já podes instalar o Leolingo",
+    items: [
+      "Agora podes instalar o Leolingo no telemóvel ou computador como se fosse uma app",
+      "Procura a opção \"Instalar\" ou \"Adicionar ao ecrã principal\" no teu browser",
+    ],
+  },
 ];
 
 export const getLatestAnnouncement = (): Announcement | undefined =>
